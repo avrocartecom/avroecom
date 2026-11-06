@@ -34,6 +34,10 @@ import {
   Copy,
   Pencil,
   X,
+  Video,
+  Film,
+  Tag,
+  Play,
 } from "lucide-react";
 import { AVRO_THEMES, AvroThemeDefinition, resolveStoreTheme, getAllThemes } from "@/lib/themes-registry";
 import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
@@ -79,6 +83,7 @@ export default function ThemesAdminPage() {
   const [isUploadingHero, setIsUploadingHero] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("ALL");
   const [activatingCode, setActivatingCode] = useState<string | null>(null);
+  const [uploadingThemeSlideIndex, setUploadingThemeSlideIndex] = useState<number | null>(null);
 
   // Custom Theme Management & Builder States
   const [customThemes, setCustomThemes] = useState<AvroThemeDefinition[]>([]);
@@ -278,6 +283,66 @@ export default function ThemesAdminPage() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAddThemeSlide = () => {
+    const existing = Array.isArray(customOverrides.heroSlides) ? customOverrides.heroSlides : [];
+    const newSlide = {
+      id: `slide-${Date.now()}`,
+      mediaType: "image",
+      mediaUrl: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=85",
+      badge: "FEATURED AD",
+      title: "Special Summer Promotion",
+      subtitle: "Discover exclusive discounts on top items.",
+      ctaText: "Shop Offer",
+      ctaLink: "/shop",
+    };
+    setCustomOverrides({ ...customOverrides, heroSlides: [...existing, newSlide] });
+  };
+
+  const handleUpdateThemeSlide = (index: number, field: string, value: any) => {
+    const existing = Array.isArray(customOverrides.heroSlides) ? [...customOverrides.heroSlides] : [];
+    existing[index] = { ...existing[index], [field]: value };
+    setCustomOverrides({ ...customOverrides, heroSlides: existing });
+  };
+
+  const handleDeleteThemeSlide = (index: number) => {
+    const existing = Array.isArray(customOverrides.heroSlides) ? customOverrides.heroSlides : [];
+    setCustomOverrides({ ...customOverrides, heroSlides: existing.filter((_: any, i: number) => i !== index) });
+  };
+
+  const handleThemeSlideFileUpload = async (file: File, index: number) => {
+    if (!file) return;
+    setUploadingThemeSlideIndex(index);
+    try {
+      const data = new FormData();
+      data.append("file", file);
+      const res = await fetch("/api/admin/media", {
+        method: "POST",
+        body: data,
+      });
+      const result = await res.json();
+      if (result.success && result.url) {
+        const isVideo =
+          file.type.startsWith("video/") ||
+          [".mp4", ".webm", ".mov", ".ogg", ".m4v"].some((ext) =>
+            file.name.toLowerCase().endsWith(ext)
+          );
+        const existing = Array.isArray(customOverrides.heroSlides) ? [...customOverrides.heroSlides] : [];
+        existing[index] = {
+          ...existing[index],
+          mediaUrl: result.url,
+          mediaType: isVideo ? "video" : "image",
+        };
+        setCustomOverrides({ ...customOverrides, heroSlides: existing });
+      } else {
+        alert(result.error || "File upload failed.");
+      }
+    } catch (e: any) {
+      alert("Upload failed: " + e.message);
+    } finally {
+      setUploadingThemeSlideIndex(null);
     }
   };
 
@@ -1205,6 +1270,132 @@ export default function ThemesAdminPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* HERO BANNER ADS & SLIDER (IMAGES & VIDEO) */}
+                <div className="pt-4 border-t border-slate-100 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-xs">Hero Banner Ads & Video Scroller</h4>
+                      <p className="text-[10px] text-slate-500">
+                        {Array.isArray(customOverrides.heroSlides) ? customOverrides.heroSlides.length : 0} active slide(s) on right carousel.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddThemeSlide}
+                      className="px-2.5 py-1.5 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 font-bold text-[11px] border border-purple-200 flex items-center gap-1 cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Add Ad Slide</span>
+                    </button>
+                  </div>
+
+                  {Array.isArray(customOverrides.heroSlides) && customOverrides.heroSlides.length > 0 && (
+                    <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                      {customOverrides.heroSlides.map((slide: any, idx: number) => {
+                        const isUploading = uploadingThemeSlideIndex === idx;
+
+                        return (
+                          <div
+                            key={slide.id || idx}
+                            className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2.5 text-xs"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-[11px] text-slate-800">
+                                Slide #{idx + 1} ({slide.mediaType === "video" ? "Video" : "Image"})
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleUpdateThemeSlide(
+                                      idx,
+                                      "mediaType",
+                                      slide.mediaType === "video" ? "image" : "video"
+                                    )
+                                  }
+                                  className="px-2 py-0.5 rounded text-[10px] font-bold bg-white border border-slate-200 text-slate-700"
+                                >
+                                  {slide.mediaType === "video" ? "Switch to Image" : "Switch to Video"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteThemeSlide(idx)}
+                                  className="p-1 rounded text-rose-600 hover:bg-rose-50"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <label className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-700 text-[11px] font-bold flex items-center gap-1 cursor-pointer">
+                                {isUploading ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  <Upload className="w-3 h-3" />
+                                )}
+                                <span>Upload File from PC</span>
+                                <input
+                                  type="file"
+                                  accept={slide.mediaType === "video" ? "video/*" : "image/*"}
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    if (e.target.files?.[0]) {
+                                      handleThemeSlideFileUpload(e.target.files[0], idx);
+                                    }
+                                  }}
+                                />
+                              </label>
+                              <input
+                                type="text"
+                                value={slide.mediaUrl || ""}
+                                onChange={(e) => handleUpdateThemeSlide(idx, "mediaUrl", e.target.value)}
+                                placeholder="Media URL link"
+                                className="flex-1 px-2.5 py-1 border border-slate-200 rounded-lg text-[11px] font-mono bg-white"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="text"
+                                value={slide.badge || ""}
+                                onChange={(e) => handleUpdateThemeSlide(idx, "badge", e.target.value)}
+                                placeholder="Badge label"
+                                className="px-2 py-1 border border-slate-200 rounded bg-white text-[11px]"
+                              />
+                              <input
+                                type="text"
+                                value={slide.title || ""}
+                                onChange={(e) => handleUpdateThemeSlide(idx, "title", e.target.value)}
+                                placeholder="Slide title"
+                                className="px-2 py-1 border border-slate-200 rounded bg-white text-[11px] font-bold"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="text"
+                                value={slide.ctaText || ""}
+                                onChange={(e) => handleUpdateThemeSlide(idx, "ctaText", e.target.value)}
+                                placeholder="Button text"
+                                className="px-2 py-1 border border-slate-200 rounded bg-white text-[11px]"
+                              />
+                              <input
+                                type="text"
+                                value={slide.ctaLink || ""}
+                                onChange={(e) => handleUpdateThemeSlide(idx, "ctaLink", e.target.value)}
+                                placeholder="Destination link"
+                                className="px-2 py-1 border border-slate-200 rounded bg-white text-[11px] font-mono"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -1559,12 +1750,36 @@ export default function ThemesAdminPage() {
                     </div>
                   </div>
 
-                  <div className="w-full md:w-48 aspect-square rounded-xl overflow-hidden shadow-md flex-shrink-0 border border-black/5">
-                    <img
-                      src={themeConfig.bannerImageUrl || activeThemeObj.hero.imageUrl}
-                      alt="Hero Preview"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-full md:w-48 aspect-square rounded-xl overflow-hidden shadow-md flex-shrink-0 border border-black/5 relative">
+                    {Array.isArray(customOverrides.heroSlides) && customOverrides.heroSlides.length > 0 ? (
+                      customOverrides.heroSlides[0].mediaType === "video" ? (
+                        <video
+                          src={customOverrides.heroSlides[0].mediaUrl}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={customOverrides.heroSlides[0].mediaUrl}
+                          alt="Hero Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      )
+                    ) : (
+                      <img
+                        src={themeConfig.bannerImageUrl || activeThemeObj.hero.imageUrl}
+                        alt="Hero Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    {Array.isArray(customOverrides.heroSlides) && customOverrides.heroSlides.length > 0 && (
+                      <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-black/70 text-white">
+                        {customOverrides.heroSlides.length} Slide(s)
+                      </span>
+                    )}
                   </div>
                 </div>
 

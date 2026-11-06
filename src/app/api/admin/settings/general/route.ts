@@ -39,7 +39,23 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ success: true, settings: themeSetting });
+    let heroSlides: any[] = [];
+    if (themeSetting.socialLinksJson) {
+      try {
+        const parsed = JSON.parse(themeSetting.socialLinksJson);
+        if (Array.isArray(parsed?.heroSlides)) {
+          heroSlides = parsed.heroSlides;
+        }
+      } catch (e) {}
+    }
+
+    return NextResponse.json({
+      success: true,
+      settings: {
+        ...themeSetting,
+        heroSlides,
+      },
+    });
   } catch (err: any) {
     console.error("GET /api/admin/settings/general error:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -73,9 +89,22 @@ export async function PUT(req: NextRequest) {
       showAnnouncementBar,
       primaryColor,
       accentColor,
+      heroSlides,
     } = body;
 
     const themeSetting = await prisma.storeThemeSetting.findFirst();
+
+    // Preserve and update heroSlides in socialLinksJson
+    let socialObj: any = {};
+    if (themeSetting?.socialLinksJson) {
+      try {
+        socialObj = JSON.parse(themeSetting.socialLinksJson);
+      } catch (e) {}
+    }
+    if (Array.isArray(heroSlides)) {
+      socialObj.heroSlides = heroSlides;
+    }
+    const finalSocialLinksJson = JSON.stringify(socialObj);
 
     const updated = await prisma.storeThemeSetting.upsert({
       where: { id: themeSetting ? themeSetting.id : "cuid_placeholder" },
@@ -102,6 +131,7 @@ export async function PUT(req: NextRequest) {
         showAnnouncementBar: showAnnouncementBar !== undefined ? Boolean(showAnnouncementBar) : undefined,
         primaryColor: primaryColor !== undefined ? primaryColor : undefined,
         accentColor: accentColor !== undefined ? accentColor : undefined,
+        socialLinksJson: finalSocialLinksJson,
       },
       create: {
         brandName: brandName || "AVRO Store",
@@ -126,6 +156,7 @@ export async function PUT(req: NextRequest) {
         showAnnouncementBar: Boolean(showAnnouncementBar),
         primaryColor: primaryColor || "#0A192F",
         accentColor: accentColor || "#2563EB",
+        socialLinksJson: finalSocialLinksJson,
       },
     });
 
@@ -134,7 +165,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Branding and general settings updated successfully!",
-      settings: updated,
+      settings: {
+        ...updated,
+        heroSlides: socialObj.heroSlides || [],
+      },
     });
   } catch (err: any) {
     console.error("PUT /api/admin/settings/general error:", err);

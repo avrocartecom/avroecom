@@ -47,16 +47,20 @@ export async function GET() {
     }
 
     let customThemes: any[] = [];
+    let heroSlides: any[] = [];
     if (themeSetting?.socialLinksJson) {
       try {
         const parsed = JSON.parse(themeSetting.socialLinksJson);
         if (Array.isArray(parsed?.customThemes)) {
           customThemes = parsed.customThemes;
         }
+        if (Array.isArray(parsed?.heroSlides)) {
+          heroSlides = parsed.heroSlides;
+        }
       } catch (e) {}
     }
 
-    return NextResponse.json({ success: true, theme: themeSetting, customThemes });
+    return NextResponse.json({ success: true, theme: themeSetting, customThemes, heroSlides });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -96,12 +100,13 @@ export async function PUT(req: NextRequest) {
       showAnnouncementBar,
       socialLinksJson,
       customThemes,
+      heroSlides,
       footerText,
     } = body;
 
     const themeSetting = await prisma.storeThemeSetting.findFirst();
 
-    // Prepare robust socialLinksJson preserving customThemes
+    // Prepare robust socialLinksJson preserving customThemes and heroSlides
     let socialObj: any = {};
     if (typeof socialLinksJson === "string") {
       try {
@@ -122,6 +127,19 @@ export async function PUT(req: NextRequest) {
         const existing = JSON.parse(themeSetting.socialLinksJson);
         if (Array.isArray(existing?.customThemes)) {
           socialObj.customThemes = existing.customThemes;
+        }
+      } catch (e) {}
+    }
+
+    if (Array.isArray(heroSlides)) {
+      socialObj.heroSlides = heroSlides;
+    } else if (Array.isArray(body?.heroSlides)) {
+      socialObj.heroSlides = body.heroSlides;
+    } else if (themeSetting?.socialLinksJson && !socialObj.heroSlides) {
+      try {
+        const existing = JSON.parse(themeSetting.socialLinksJson);
+        if (Array.isArray(existing?.heroSlides)) {
+          socialObj.heroSlides = existing.heroSlides;
         }
       } catch (e) {}
     }

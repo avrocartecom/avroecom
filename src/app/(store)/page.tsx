@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { AVRO_THEMES, AvroThemeDefinition, resolveStoreTheme } from "@/lib/themes-registry";
 import { ProductCard } from "@/components/product-card";
+import { HeroBannerSlider, HeroBannerSlide } from "@/components/hero-banner-slider";
 import { getCachedStoreTheme } from "@/lib/theme-cache";
 import { getStorePermissions } from "@/lib/permissions";
 
@@ -70,6 +71,8 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
       customOverrides = JSON.parse(dbTheme.socialLinksJson);
     }
   } catch (e) {}
+
+  const heroSlides: HeroBannerSlide[] = Array.isArray(customOverrides.heroSlides) ? customOverrides.heroSlides : [];
 
   const primaryColor = !themeParam && dbTheme?.primaryColor ? dbTheme.primaryColor : themeDef.palette.primary;
   const accentColor = !themeParam && dbTheme?.accentColor ? dbTheme.accentColor : themeDef.palette.accent;
@@ -256,47 +259,19 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
               </div>
             </div>
 
-            {/* Right — Hero image */}
+            {/* Right — Hero banner slider / carousel (supports images & video ads with right scroll) */}
             <div className="avro-slide-right lg:col-span-5">
-              <div
-                className="relative overflow-hidden aspect-[4/5] shadow-2xl border transition-all group"
-                style={{
-                  borderColor: isDarkHero ? "rgba(255,255,255,0.1)" : themeDef.palette.border,
-                  borderRadius: themeDef.typography.buttonRadius === "rounded-none" ? "0px" : "24px",
-                }}
-              >
-                <img
-                  src={heroImage}
-                  alt={headline}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-                {/* Floating card at bottom */}
-                <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-between avro-fade-in-delay-3">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-300 block">
-                      Featured Collection
-                    </span>
-                    <strong className="text-sm font-extrabold block">{themeDef.name}</strong>
-                    <span className="text-[11px] text-slate-200 line-clamp-1">{themeDef.tagline}</span>
-                  </div>
-                  <Link
-                    href="/shop"
-                    className="avro-btn p-2 rounded-lg bg-white text-slate-900 font-bold hover:bg-slate-100 flex-shrink-0"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-
-                {/* Decorative corner accent */}
-                <div
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 flex items-center justify-center backdrop-blur-sm"
-                  style={{ borderColor: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.1)" }}
-                >
-                  <Star className="w-3.5 h-3.5 text-white fill-white" />
-                </div>
-              </div>
+              <HeroBannerSlider
+                slides={heroSlides}
+                fallbackImage={heroImage}
+                fallbackTitle={themeDef.name}
+                fallbackTagline={themeDef.tagline}
+                themeDef={themeDef}
+                isDarkHero={isDarkHero}
+                primaryColor={primaryColor}
+                accentColor={accentColor}
+                buttonRadius={buttonRadius}
+              />
             </div>
           </div>
         </div>
