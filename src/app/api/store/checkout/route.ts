@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendOrderConfirmationEmail, sendMerchantNewOrderAlertEmail } from "@/lib/email-service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -129,6 +130,14 @@ export async function POST(req: NextRequest) {
         data: { usedCount: { increment: 1 } },
       });
     }
+
+    // 7. Trigger automated transactional emails (asynchronously, non-blocking)
+    sendOrderConfirmationEmail(order).catch((err) =>
+      console.error("[Email Automation] Order confirmation email dispatch failed:", err)
+    );
+    sendMerchantNewOrderAlertEmail(order).catch((err) =>
+      console.error("[Email Automation] Merchant alert email dispatch failed:", err)
+    );
 
     return NextResponse.json({
       success: true,

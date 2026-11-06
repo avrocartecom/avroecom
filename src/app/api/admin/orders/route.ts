@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendOrderShippedEmail } from "@/lib/email-service";
 
 // GET: List all orders with optional search and status filter
 export async function GET(req: NextRequest) {
@@ -252,6 +253,13 @@ export async function PUT(req: NextRequest) {
         customer: true,
       },
     });
+
+    // If order was marked as SHIPPED or tracking number assigned, dispatch automated shipment email
+    if (orderStatus === "SHIPPED" || (trackingNumber && trackingNumber.trim().length > 0)) {
+      sendOrderShippedEmail(updated).catch((err) =>
+        console.error("[Email Automation] Shipment dispatch email failed:", err)
+      );
+    }
 
     return NextResponse.json({
       success: true,
