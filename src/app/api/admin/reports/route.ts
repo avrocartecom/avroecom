@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { enforceApiFeatureAccess } from "@/lib/permissions";
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,6 +37,9 @@ export async function GET(req: NextRequest) {
 
     // Check if CSV format is requested
     if (format === "csv") {
+      const guard = await enforceApiFeatureAccess("downloadableReports");
+      if (!guard.allowed) return guard.response;
+
       const headers = [
         "Order Number",
         "Order Date",

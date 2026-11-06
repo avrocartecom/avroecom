@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
         licenseKey: payload.licenseKey,
         plan: payload.plan,
         status: payload.status,
-        domain: lic.domain || domain,
+        domain: payload.boundDomain || domain,
         installationUuid,
         entitlementsJson: JSON.stringify(payload.entitlements),
         expiresAt: new Date(payload.expiresAt),

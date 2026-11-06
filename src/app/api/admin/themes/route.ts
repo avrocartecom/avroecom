@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { enforceApiFeatureAccess } from "@/lib/permissions";
 
 export async function GET() {
   try {
@@ -51,6 +52,11 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
+    const access = await enforceApiFeatureAccess("themeCustomization");
+    if (!access.allowed) {
+      return access.response;
+    }
+
     const body = await req.json();
     const {
       activeTheme,

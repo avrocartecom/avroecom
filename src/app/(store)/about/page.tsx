@@ -49,7 +49,7 @@ Powered by AVRO, our store operates on independent high-security infrastructure,
       {/* Main Narrative Content */}
       <div className="bg-white p-8 sm:p-12 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
         <div className="prose prose-slate max-w-none text-sm text-slate-600 leading-relaxed space-y-4">
-          {contentBlocks.map((block, idx) => {
+          {contentBlocks.map((block: string, idx: number) => {
             if (block.startsWith("### ")) {
               return (
                 <h3 key={idx} className="text-lg font-bold text-[#0A192F] pt-4">

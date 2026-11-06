@@ -15,13 +15,33 @@ import {
   Tag,
   ArrowUpRight,
   Filter,
+  Lock,
 } from "lucide-react";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
 
 export default function ReportsAdminPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState("30d"); // today, 7d, 30d, ytd, all
   const [downloading, setDownloading] = useState(false);
+
+  // Plan Permissions State
+  const [permissions, setPermissions] = useState<{
+    plan: PlanTier;
+    featureMatrix: Record<string, { allowed: boolean }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/permissions")
+      .then((res) => res.json())
+      .then((perm) => {
+        if (perm && perm.plan) setPermissions(perm);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchReports = (selectedRange: string) => {
     setLoading(true);
@@ -39,6 +59,11 @@ export default function ReportsAdminPage() {
   }, [range]);
 
   const handleDownloadCsv = () => {
+    if (permissions && permissions.featureMatrix.downloadableReports?.allowed === false) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setDownloading(true);
     try {
       const url = `/api/admin/reports?format=csv&range=${range}`;
@@ -116,13 +141,35 @@ export default function ReportsAdminPage() {
           <button
             onClick={handleDownloadCsv}
             disabled={downloading}
-            className="px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2"
+            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 ${
+              permissions && permissions.featureMatrix.downloadableReports?.allowed === false
+                ? "bg-amber-500 hover:bg-amber-600 text-white"
+                : "bg-emerald-600 hover:bg-emerald-700 text-white"
+            }`}
           >
-            <Download className="w-3.5 h-3.5" />
-            {downloading ? "Exporting..." : "Download CSV Report"}
+            {permissions && permissions.featureMatrix.downloadableReports?.allowed === false ? (
+              <>
+                <Lock className="w-3.5 h-3.5" />
+                <span>Unlock CSV Export (Plus)</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-3.5 h-3.5" />
+                <span>{downloading ? "Exporting..." : "Download CSV Report"}</span>
+              </>
+            )}
           </button>
         </div>
       </div>
+
+      {/* Locked Feature Notice for Basic Customers */}
+      {permissions && permissions.featureMatrix.advancedSalesReports?.allowed === false && (
+        <LockedFeatureBanner
+          feature="advancedSalesReports"
+          currentPlan={permissions.plan}
+          onUpgradeSuccess={() => fetchReports(range)}
+        />
+      )}
 
       {loading ? (
         <div className="text-xs text-slate-400 py-16 text-center">
@@ -319,6 +366,17 @@ export default function ReportsAdminPage() {
           </div>
         </>
       )}
+
+      {/* Plan Upgrade Modal (targeting Plus for downloadable reports) */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || "BASIC"}
+        recommendedTarget="PLUS"
+        onSuccess={() => {
+          fetchReports(range);
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { enforceApiFeatureAccess } from "@/lib/permissions";
 
 // GET /api/products/[id]/reviews - Fetch approved reviews and rating stats
 export async function GET(
@@ -61,6 +62,9 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = await enforceApiFeatureAccess("productReviews");
+    if (!guard.allowed) return guard.response;
+
     const productId = params.id;
     const body = await req.json();
 

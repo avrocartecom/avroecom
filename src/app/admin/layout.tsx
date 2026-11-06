@@ -52,8 +52,11 @@ import {
   Share2,
   Package,
   Star,
+  Sparkles,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { FeatureKey, PlanTier } from "@/lib/license-core";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
 
 interface AdminUser {
   id: string;
@@ -76,6 +79,19 @@ export default function StoreAdminLayout({
   const [broadcasts, setBroadcasts] = useState<any[]>([]);
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Subscription & Permission Engine State
+  const [permissionsData, setPermissionsData] = useState<{
+    plan: PlanTier;
+    planName: string;
+    priceINR: number;
+    isActive: boolean;
+    isExpired: boolean;
+    expiresAt?: string;
+    featureMatrix: Record<string, { allowed: boolean; requiredPlan: PlanTier; upgradeMessage: string }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeModalTarget, setUpgradeModalTarget] = useState<PlanTier>("GROW");
 
   // Admin Basics: Interactive UI States
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -163,9 +179,22 @@ export default function StoreAdminLayout({
     };
   }, [pathname, isLoginPage, router]);
 
+  const loadPermissions = () => {
+    fetch("/api/admin/permissions")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.plan) {
+          setPermissionsData(data);
+        }
+      })
+      .catch(() => {});
+  };
+
   // License & Broadcasts loader
   useEffect(() => {
     if (isLoginPage) return;
+
+    loadPermissions();
 
     fetch("/api/admin/dashboard")
       .then((res) => res.json())
@@ -244,8 +273,15 @@ export default function StoreAdminLayout({
     );
   }
 
-  // --- Complete Merchant Menu Hierarchy ---
-  const menuSections = [
+  // --- Complete Merchant Menu Hierarchy with Plan Feature Mapping ---
+  interface MenuItem {
+    label: string;
+    href: string;
+    icon: any;
+    featureKey?: FeatureKey;
+  }
+
+  const menuSections: { group: string; items: MenuItem[] }[] = [
     {
       group: "Home",
       items: [{ label: "Home Dashboard", href: "/admin", icon: LayoutDashboard }],
@@ -265,7 +301,7 @@ export default function StoreAdminLayout({
         { label: "Inventory Control", href: "/admin/inventory", icon: BarChart3 },
         { label: "Collections", href: "/admin/collections", icon: Archive },
         { label: "Gift Cards", href: "/admin/gift-cards", icon: Gift },
-        { label: "Product Reviews", href: "/admin/reviews", icon: Star },
+        { label: "Product Reviews", href: "/admin/reviews", icon: Star, featureKey: "productReviews" },
         { label: "Combo Deals & Bundles", href: "/admin/combos", icon: PackagePlus },
         { label: "Categories", href: "/admin/categories", icon: Package },
       ],
@@ -276,8 +312,8 @@ export default function StoreAdminLayout({
         { label: "Discounts & Coupons", href: "/admin/coupons", icon: Tag },
         { label: "Customers", href: "/admin/customers", icon: Users },
         { label: "Customer Segments", href: "/admin/customers/segments", icon: UserCheck },
-        { label: "B2B Companies", href: "/admin/customers/companies", icon: Building2 },
-        { label: "Growth & Attribution", href: "/admin/growth", icon: TrendingUp },
+        { label: "B2B Companies", href: "/admin/customers/companies", icon: Building2, featureKey: "b2bCommerce" },
+        { label: "Growth & Attribution", href: "/admin/growth", icon: TrendingUp, featureKey: "advancedSalesReports" },
         { label: "Analytics & Reports", href: "/admin/reports", icon: PieChart },
       ],
     },
@@ -288,19 +324,19 @@ export default function StoreAdminLayout({
         { label: "Navigation Menus", href: "/admin/content/menus", icon: MenuIcon },
         { label: "Blog Posts", href: "/admin/content/blog", icon: BookOpen },
         { label: "Metaobjects", href: "/admin/content/metaobjects", icon: Database },
-        { label: "Themes & Editor", href: "/admin/themes", icon: Palette },
-        { label: "Pages & Preferences", href: "/admin/pages", icon: FileText },
+        { label: "Themes & Editor", href: "/admin/themes", icon: Palette, featureKey: "themeCustomization" },
+        { label: "Pages & Preferences", href: "/admin/pages", icon: FileText, featureKey: "customPages" },
       ],
     },
     {
       group: "Apps & Integrations",
       items: [
-        { label: "Apps Directory", href: "/admin/apps", icon: Package },
-        { label: "Shiprocket Logistics", href: "/admin/apps/shiprocket", icon: Truck },
-        { label: "Zoho Sync", href: "/admin/apps/zoho", icon: Sliders },
-        { label: "Google Sheets Stream", href: "/admin/apps/google-sheets", icon: FileText },
+        { label: "Apps Directory", href: "/admin/apps", icon: Package, featureKey: "appIntegrations" },
+        { label: "Shiprocket Logistics", href: "/admin/apps/shiprocket", icon: Truck, featureKey: "courierIntegrations" },
+        { label: "Zoho Sync", href: "/admin/apps/zoho", icon: Sliders, featureKey: "zohoSync" },
+        { label: "Google Sheets Stream", href: "/admin/apps/google-sheets", icon: FileText, featureKey: "googleSheetsSync" },
         { label: "WhatsApp & Notifications", href: "/admin/apps/whatsapp", icon: Radio },
-        { label: "Print on Demand (POD)", href: "/admin/apps/pod", icon: Layers },
+        { label: "Print on Demand (POD)", href: "/admin/apps/pod", icon: Layers, featureKey: "printOnDemand" },
       ],
     },
     {
@@ -614,9 +650,23 @@ export default function StoreAdminLayout({
             title="License Key Writing & Central Connecting Centre"
           >
             <Key className="w-3.5 h-3.5 text-amber-500" />
-            <span>{licenseInfo?.plan || "PLUS"} Active</span>
+            <span>{permissionsData?.plan || licenseInfo?.plan || "BASIC"} Active</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           </Link>
+
+          {/* Quick Upgrade Button in Header if not PLUS */}
+          {permissionsData && permissionsData.plan !== "PLUS" && (
+            <button
+              onClick={() => {
+                setUpgradeModalTarget(permissionsData.plan === "BASIC" ? "GROW" : "PLUS");
+                setUpgradeModalOpen(true);
+              }}
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-[10px] uppercase tracking-wider transition shadow-xs"
+            >
+              <Sparkles className="w-3 h-3 text-white" />
+              <span>Upgrade</span>
+            </button>
+          )}
 
           {/* Central Support Pill */}
           <Link
@@ -655,7 +705,40 @@ export default function StoreAdminLayout({
       <div className="flex flex-1 min-h-[calc(100vh-4rem)]">
         {/* Desktop Sidebar */}
         <aside className="hidden md:flex w-64 bg-white border-r border-slate-200/80 flex-shrink-0 flex-col justify-between overflow-y-auto">
-          <div className="p-3 space-y-4">
+          <div className="p-3 space-y-3">
+            {/* Subscription Plan Active Badge Card */}
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#0A192F] via-[#102445] to-[#0A192F] text-white border border-blue-900/40 shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-wider text-blue-300">
+                    {permissionsData?.planName || "Basic Plan"}
+                  </span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-mono text-[10px] font-extrabold border border-blue-400/30">
+                  ₹{permissionsData?.priceINR || 349}/mo
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-white/10">
+                <span className="text-slate-400 text-[10px]">
+                  {permissionsData?.isExpired ? "Subscription Expired" : "Active & Verified"}
+                </span>
+                {permissionsData && permissionsData.plan !== "PLUS" && (
+                  <button
+                    onClick={() => {
+                      setUpgradeModalTarget(permissionsData.plan === "BASIC" ? "GROW" : "PLUS");
+                      setUpgradeModalOpen(true);
+                    }}
+                    className="text-amber-400 hover:text-amber-300 font-bold text-[10px] uppercase tracking-wide flex items-center gap-1 transition"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    Upgrade ↗
+                  </button>
+                )}
+              </div>
+            </div>
+
             {menuSections.map((sec, sIdx) => (
               <div key={sIdx} className="space-y-1">
                 <div className="px-3 py-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
@@ -664,18 +747,38 @@ export default function StoreAdminLayout({
                 {sec.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
+                  const isLocked = Boolean(
+                    item.featureKey &&
+                    permissionsData?.featureMatrix?.[item.featureKey]?.allowed === false
+                  );
+
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                         isActive
                           ? "bg-[#0A192F] text-white shadow-xs font-bold"
                           : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                       }`}
                     >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{item.label}</span>
+                      <div className="flex items-center gap-2.5 truncate">
+                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {isLocked && (
+                        <span
+                          className={`ml-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase shrink-0 ${
+                            isActive
+                              ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
+                              : "bg-amber-50 text-amber-700 border border-amber-200"
+                          }`}
+                          title={`Locked on ${permissionsData?.plan || "BASIC"}. Upgrade to unlock.`}
+                        >
+                          <Lock className="w-2.5 h-2.5" />
+                          Lock
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -685,6 +788,22 @@ export default function StoreAdminLayout({
 
           {/* Sidebar Footer */}
           <div className="p-3 border-t border-slate-200/80 space-y-2 text-xs">
+            {permissionsData && permissionsData.plan !== "PLUS" && (
+              <button
+                onClick={() => {
+                  setUpgradeModalTarget(permissionsData.plan === "BASIC" ? "GROW" : "PLUS");
+                  setUpgradeModalOpen(true);
+                }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold transition shadow-xs text-xs"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
+                  <span>Upgrade Subscription</span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+
             <button
               onClick={handleLogout}
               disabled={loggingOut}
@@ -719,6 +838,31 @@ export default function StoreAdminLayout({
                   </button>
                 </div>
 
+                {/* Mobile Plan Banner */}
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-[#0A192F] via-[#102445] to-[#0A192F] text-white border border-blue-900/40 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-300">
+                      {permissionsData?.planName || "Basic Plan"}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-mono text-[10px] font-extrabold">
+                      ₹{permissionsData?.priceINR || 349}/mo
+                    </span>
+                  </div>
+                  {permissionsData && permissionsData.plan !== "PLUS" && (
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setUpgradeModalTarget(permissionsData.plan === "BASIC" ? "GROW" : "PLUS");
+                        setUpgradeModalOpen(true);
+                      }}
+                      className="w-full py-1.5 rounded-xl bg-amber-500 text-white font-bold text-[10px] uppercase tracking-wide flex items-center justify-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      Upgrade Plan
+                    </button>
+                  )}
+                </div>
+
                 {menuSections.map((sec, sIdx) => (
                   <div key={sIdx} className="space-y-1">
                     <div className="px-2 py-0.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
@@ -727,19 +871,32 @@ export default function StoreAdminLayout({
                     {sec.items.map((item) => {
                       const Icon = item.icon;
                       const isActive = pathname === item.href;
+                      const isLocked = Boolean(
+                        item.featureKey &&
+                        permissionsData?.featureMatrix?.[item.featureKey]?.allowed === false
+                      );
+
                       return (
                         <Link
                           key={item.href}
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                          className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                             isActive
                               ? "bg-[#0A192F] text-white font-bold"
                               : "text-slate-600 hover:bg-slate-100"
                           }`}
                         >
-                          <Icon className="w-4 h-4 flex-shrink-0" />
-                          <span>{item.label}</span>
+                          <div className="flex items-center gap-2.5">
+                            <Icon className="w-4 h-4 flex-shrink-0" />
+                            <span>{item.label}</span>
+                          </div>
+                          {isLocked && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-50 text-amber-700 border border-amber-200">
+                              <Lock className="w-2.5 h-2.5" />
+                              Lock
+                            </span>
+                          )}
                         </Link>
                       );
                     })}
@@ -835,6 +992,17 @@ export default function StoreAdminLayout({
           )}
         </main>
       </div>
+
+      {/* Global Interactive Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissionsData?.plan || "BASIC"}
+        recommendedTarget={upgradeModalTarget}
+        onSuccess={() => {
+          loadPermissions();
+        }}
+      />
     </div>
   );
 }

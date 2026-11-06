@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { enforceApiFeatureAccess } from "@/lib/permissions";
 
 // PATCH /api/admin/reviews/[id] - Toggle approval status or update review
 export async function PATCH(
@@ -9,6 +10,9 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = await enforceApiFeatureAccess("productReviews");
+    if (!guard.allowed) return guard.response;
+
     const reviewId = params.id;
     const body = await req.json();
 
@@ -59,6 +63,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const guard = await enforceApiFeatureAccess("productReviews");
+    if (!guard.allowed) return guard.response;
+
     const reviewId = params.id;
 
     const existingReview = await prisma.productReview.findUnique({

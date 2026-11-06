@@ -27,10 +27,22 @@ import {
   Info,
   Upload,
   Loader2,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
+
+const BASIC_ALLOWED_THEMES = ["AVRO_SIGNATURE", "FASHION_NOIR", "TALIM_DEFAULT"];
 
 export default function ThemesAdminPage() {
+  const [permissions, setPermissions] = useState<{
+    plan: PlanTier;
+    featureMatrix: Record<string, { allowed: boolean }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [themeConfig, setThemeConfig] = useState<any>(null);
   const [customOverrides, setCustomOverrides] = useState<any>({
     backgroundColor: "#F8FAFC",
@@ -99,6 +111,13 @@ export default function ThemesAdminPage() {
 
   const loadTheme = () => {
     setLoading(true);
+    fetch("/api/admin/permissions")
+      .then((res) => res.json())
+      .then((perm) => {
+        if (perm && perm.plan) setPermissions(perm);
+      })
+      .catch(() => {});
+
     fetch("/api/admin/themes")
       .then((res) => res.json())
       .then((data) => {
@@ -122,6 +141,11 @@ export default function ThemesAdminPage() {
   }, []);
 
   const handleApplyPreset = async (preset: AvroThemeDefinition) => {
+    if (permissions?.plan === "BASIC" && !BASIC_ALLOWED_THEMES.includes(preset.code)) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setActivatingCode(preset.code);
     const newOverrides = {
       backgroundColor: preset.palette.background,
@@ -175,6 +199,12 @@ export default function ThemesAdminPage() {
 
   const handleSaveTheme = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+
+    if (permissions?.featureMatrix?.themeCustomization?.allowed === false) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setIsSaving(true);
     setSaveSuccess(false);
 
@@ -193,6 +223,8 @@ export default function ThemesAdminPage() {
       if (res.ok) {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 4000);
+      } else if (res.status === 403) {
+        setUpgradeModalOpen(true);
       }
     } finally {
       setIsSaving(false);
@@ -304,6 +336,15 @@ export default function ThemesAdminPage() {
             Inspect Storefront <ExternalLink className="w-3 h-3" />
           </a>
         </div>
+      )}
+
+      {/* Locked Feature Notice if on Basic Plan */}
+      {permissions && permissions.featureMatrix.themeCustomization?.allowed === false && (
+        <LockedFeatureBanner
+          feature="themeCustomization"
+          currentPlan={permissions.plan}
+          onUpgradeSuccess={loadTheme}
+        />
       )}
 
       {/* TAB 1: VISUAL THEME EDITOR (SPLIT PANE) */}
@@ -1180,6 +1221,25 @@ export default function ThemesAdminPage() {
       {/* TAB 2: PRESET THEME ARCHETYPES LIBRARY */}
       {activeTab === "LIBRARY" && (
         <div className="space-y-6">
+          {/* Basic Plan Theme Limitation Alert */}
+          {permissions && permissions.plan === "BASIC" && (
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Basic Plan Theme Limitation:</strong> Your plan includes 2 preset themes (AVRO Signature & Fashion Noir). Upgrade to <strong>Grow</strong> or <strong>Plus</strong> to unlock all 13 specialized archetypes and custom visual styling.
+                </span>
+              </div>
+              <button
+                onClick={() => setUpgradeModalOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 transition flex items-center gap-1.5 shadow-xs"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-white" />
+                Upgrade Plan
+              </button>
+            </div>
+          )}
+
           {/* Active Preset Notification */}
           <div className="bg-gradient-to-r from-[#0A192F] to-[#1E293B] rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -1239,6 +1299,9 @@ export default function ThemesAdminPage() {
                 themeConfig?.activeTheme === th.id ||
                 (themeConfig?.activeTheme === "TALIM_DEFAULT" && th.code === "AVRO_SIGNATURE");
               const isActivating = activatingCode === th.code;
+              const isThemeLocked = Boolean(
+                permissions?.plan === "BASIC" && !BASIC_ALLOWED_THEMES.includes(th.code)
+              );
 
               return (
                 <div
@@ -1246,6 +1309,8 @@ export default function ThemesAdminPage() {
                   className={`rounded-2xl bg-white border overflow-hidden shadow-xs transition-all relative flex flex-col justify-between ${
                     isActive
                       ? "border-[#2563EB] ring-2 ring-[#2563EB]/20 shadow-md"
+                      : isThemeLocked
+                      ? "border-amber-200/80 bg-slate-50/40"
                       : "border-slate-200 hover:border-slate-300 hover:shadow-md"
                   }`}
                 >
@@ -1262,11 +1327,15 @@ export default function ThemesAdminPage() {
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-black/70 text-white backdrop-blur-sm">
                           {th.industry}
                         </span>
-                        {isActive && (
+                        {isActive ? (
                           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#2563EB] text-white flex items-center gap-1 shadow-sm">
                             <Check className="w-3 h-3" /> ACTIVE
                           </span>
-                        )}
+                        ) : isThemeLocked ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/90 text-white flex items-center gap-1 shadow-sm">
+                            <Lock className="w-3 h-3" /> GROW / PLUS
+                          </span>
+                        ) : null}
                       </div>
 
                       <div className="absolute bottom-3 left-4 right-4 text-white">
@@ -1309,6 +1378,15 @@ export default function ThemesAdminPage() {
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         Active Preset
                       </div>
+                    ) : isThemeLocked ? (
+                      <button
+                        type="button"
+                        onClick={() => setUpgradeModalOpen(true)}
+                        className="w-full py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-amber-600" />
+                        Unlock with Grow / Plus
+                      </button>
                     ) : (
                       <button
                         type="button"
@@ -1333,6 +1411,17 @@ export default function ThemesAdminPage() {
           </div>
         </div>
       )}
+
+      {/* Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || "BASIC"}
+        recommendedTarget="GROW"
+        onSuccess={() => {
+          loadTheme();
+        }}
+      />
     </div>
   );
 }

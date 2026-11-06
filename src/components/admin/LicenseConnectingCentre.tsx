@@ -29,14 +29,32 @@ import {
   Shield,
   Layers,
   ArrowRight,
+  Sparkles,
+  Plus,
 } from "lucide-react";
+import { UpgradePlanModal } from "./UpgradePlanModal";
+import {
+  PlanTier,
+  PLAN_PRICING,
+  PLAN_NAMES,
+  FEATURE_REGISTRY,
+  FeatureKey,
+} from "@/lib/license-core";
 
 export default function LicenseConnectingCentre() {
   const [license, setLicense] = useState<any>(null);
+  const [permissions, setPermissions] = useState<any>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [upgradeTarget, setUpgradeTarget] = useState<PlanTier>("GROW");
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState("");
   const [syncError, setSyncError] = useState("");
+
+  // Separately Chargeable Custom Addons State
+  const [newAddonInput, setNewAddonInput] = useState("");
+  const [grantingAddon, setGrantingAddon] = useState(false);
+  const [addonFeedback, setAddonFeedback] = useState<string | null>(null);
 
   // Writing / Input State
   const [keyInput, setKeyInput] = useState("");
@@ -68,6 +86,14 @@ export default function LicenseConnectingCentre() {
 
   const loadLicenseData = () => {
     setLoading(true);
+
+    fetch("/api/admin/permissions")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.plan) setPermissions(data);
+      })
+      .catch(() => {});
+
     fetch("/api/admin/dashboard")
       .then((res) => res.json())
       .then((data) => {
@@ -80,6 +106,35 @@ export default function LicenseConnectingCentre() {
         // Fallback
       })
       .finally(() => setLoading(false));
+  };
+
+  const handleGrantCustomAddon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAddonInput.trim()) return;
+
+    setGrantingAddon(true);
+    setAddonFeedback(null);
+    try {
+      const res = await fetch("/api/admin/license/custom-addon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          addonKey: newAddonInput.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAddonFeedback(`Custom Add-on "${newAddonInput.trim()}" granted successfully!`);
+        setNewAddonInput("");
+        loadLicenseData();
+      } else {
+        setAddonFeedback(`Failed: ${data.error || "Could not grant add-on"}`);
+      }
+    } catch (err: any) {
+      setAddonFeedback(`Error: ${err.message}`);
+    } finally {
+      setGrantingAddon(false);
+    }
   };
 
   useEffect(() => {
@@ -662,77 +717,310 @@ export default function LicenseConnectingCentre() {
         </div>
       </div>
 
-      {/* SECTION 4: UNLOCKED STORE FEATURE ENTITLEMENTS */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-4">
-        <div>
-          <h3 className="text-lg font-black text-[#0A192F]">
-            Cryptographically Unlocked Store Entitlements
-          </h3>
-          <p className="text-xs text-slate-500">
-            Features currently enabled on this independent self-hosted store based on the active license token signature.
-          </p>
+      {/* SECTION 4: SUBSCRIPTION PACKAGES & UPGRADE MANAGEMENT */}
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded-md bg-blue-50 text-blue-600">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <h3 className="text-lg font-black text-[#0A192F]">
+                Subscription Plans & Feature Access Control
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              AVRO CART subscription tier determines which ecommerce capabilities, logistics APIs, and theme customizations are unlocked on this store.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200">
+              Active: {permissions?.planName || license?.plan || "BASIC"} (₹{permissions?.priceINR || 349}/mo)
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 text-xs">
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="font-bold text-slate-800 block">Online Payment Gateways</span>
-              <span className="text-[11px] text-slate-400 block">Razorpay, PhonePe, Stripe, Cash on Delivery</span>
+        {/* 3 Tier Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* BASIC */}
+          <div
+            className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 ${
+              (permissions?.plan || license?.plan) === "BASIC"
+                ? "border-blue-600 bg-blue-50/20 ring-2 ring-blue-500/20"
+                : "border-slate-200 bg-slate-50/40"
+            }`}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-black text-sm text-slate-900">BASIC PLAN</h4>
+                {(permissions?.plan || license?.plan) === "BASIC" && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-600 text-white">
+                    CURRENT
+                  </span>
+                )}
+              </div>
+              <div>
+                <span className="text-2xl font-black text-slate-900">₹349</span>
+                <span className="text-xs text-slate-500"> / month</span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Complete core ecommerce, payments, inventory, manual shipping, and 2 preset themes.
+              </p>
+              <div className="space-y-1.5 pt-2 border-t border-slate-200/60 text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Online Gateways (Razorpay/UPI/COD)</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Manual Shipping Management</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>2 Preset Themes (Signature & Noir)</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-400 text-[11px]">
+                  <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>Courier APIs & Theme Customizer Locked</span>
+                </div>
+              </div>
             </div>
-            {ents.paymentGateways ? (
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                <Check className="w-3.5 h-3.5" /> Unlocked
-              </span>
-            ) : (
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-slate-100 text-slate-500 flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5" /> Locked (Grow/Plus)
-              </span>
-            )}
+
+            {(permissions?.plan || license?.plan) === "BASIC" ? (
+              <div className="py-2 text-center text-xs font-bold text-blue-700 bg-blue-100/60 rounded-xl">
+                Active Plan
+              </div>
+            ) : null}
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="font-bold text-slate-800 block">Automated Courier Logistics</span>
-              <span className="text-[11px] text-slate-400 block">Shiprocket, Delhivery, DTDC, Speed Post APIs</span>
+          {/* GROW */}
+          <div
+            className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 ${
+              (permissions?.plan || license?.plan) === "GROW"
+                ? "border-blue-600 bg-blue-50/20 ring-2 ring-blue-500/20"
+                : "border-slate-200 bg-white shadow-xs"
+            }`}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <h4 className="font-black text-sm text-slate-900">GROW PLAN</h4>
+                  <span className="px-2 py-0.2 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 uppercase">
+                    POPULAR
+                  </span>
+                </div>
+                {(permissions?.plan || license?.plan) === "GROW" && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-600 text-white">
+                    CURRENT
+                  </span>
+                )}
+              </div>
+              <div>
+                <span className="text-2xl font-black text-slate-900">₹499</span>
+                <span className="text-xs text-slate-500"> / month</span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Automated courier APIs (Shiprocket/Delhivery), theme customizer, reviews & custom pages.
+              </p>
+              <div className="space-y-1.5 pt-2 border-t border-slate-200/60 text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Full Theme Customizer & 13 Presets</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Courier APIs (Shiprocket/Delhivery/DTDC)</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Product Reviews & Moderation</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Custom CMS Pages & Google Sheets/Zoho</span>
+                </div>
+              </div>
             </div>
-            {ents.courierIntegrations ? (
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                <Check className="w-3.5 h-3.5" /> Unlocked
-              </span>
-            ) : (
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-slate-100 text-slate-500 flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5" /> Locked (Grow/Plus)
-              </span>
-            )}
+
+            {(permissions?.plan || license?.plan) === "GROW" ? (
+              <div className="py-2 text-center text-xs font-bold text-blue-700 bg-blue-100/60 rounded-xl">
+                Active Plan
+              </div>
+            ) : (permissions?.plan || license?.plan) === "BASIC" ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setUpgradeTarget("GROW");
+                  setUpgradeModalOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                Upgrade to Grow
+              </button>
+            ) : null}
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="font-bold text-slate-800 block">13 Storefront Industry Themes</span>
-              <span className="text-[11px] text-slate-400 block">Live customizer, custom presets & CSS injection</span>
+          {/* PLUS */}
+          <div
+            className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 ${
+              (permissions?.plan || license?.plan) === "PLUS"
+                ? "border-blue-600 bg-blue-50/20 ring-2 ring-blue-500/20"
+                : "border-slate-200 bg-white shadow-xs"
+            }`}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-black text-sm text-slate-900">PLUS PLAN</h4>
+                {(permissions?.plan || license?.plan) === "PLUS" && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-600 text-white">
+                    CURRENT
+                  </span>
+                )}
+              </div>
+              <div>
+                <span className="text-2xl font-black text-slate-900">₹799</span>
+                <span className="text-xs text-slate-500"> / month</span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                B2B wholesale portal, multi-store switcher, downloadable Excel/CSV reports & 24/7 support.
+              </p>
+              <div className="space-y-1.5 pt-2 border-t border-slate-200/60 text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Everything in Grow Included</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>B2B Corporate Wholesale & Net-30</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Downloadable CSV/Excel Sales Reports</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Multi-Store Switcher & 24/7 Call Support</span>
+                </div>
+              </div>
             </div>
-            {ents.customThemes ? (
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                <Check className="w-3.5 h-3.5" /> Unlocked
-              </span>
-            ) : (
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-slate-100 text-slate-500 flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5" /> Basic Theme Only
-              </span>
-            )}
-          </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="font-bold text-slate-800 block">Admin Staff User Seats</span>
-              <span className="text-[11px] text-slate-400 block">Team members with 2FA authorization</span>
-            </div>
-            <strong className="text-sm font-extrabold text-[#0A192F]">
-              {ents.maxAdminUsers || 1} User Seats Allowed
-            </strong>
+            {(permissions?.plan || license?.plan) === "PLUS" ? (
+              <div className="py-2 text-center text-xs font-bold text-blue-700 bg-blue-100/60 rounded-xl">
+                Active Plan (All Unlocked)
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setUpgradeTarget("PLUS");
+                  setUpgradeModalOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                Upgrade to Plus
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* SECTION 5: SEPARATELY CHARGEABLE CUSTOMIZATIONS & ADD-ONS */}
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded-md bg-amber-50 text-amber-600">
+                <Cpu className="w-4 h-4" />
+              </span>
+              <h3 className="text-lg font-black text-[#0A192F]">
+                Separately Chargeable Customizations & Services
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Custom features, special integrations, and personalized design modifications configurable independently of regular monthly subscription.
+            </p>
+          </div>
+        </div>
+
+        {addonFeedback && (
+          <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+            <span>{addonFeedback}</span>
+          </div>
+        )}
+
+        {/* Currently Active Custom Grants */}
+        <div className="space-y-3">
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 block">
+            Active Separately Purchased Custom Grants
+          </span>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {(license?.entitlements?.customAddons && license.entitlements.customAddons.length > 0) ? (
+              license.entitlements.customAddons.map((addon: string) => (
+                <div
+                  key={addon}
+                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="font-bold text-slate-800">{addon}</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">
+                    ACTIVE
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-400 text-xs col-span-full">
+                No separately charged custom add-on services currently bound. Use the administration tool below to activate authorized add-ons.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Administration Tool to Grant Purchased Custom Add-on */}
+        <form onSubmit={handleGrantCustomAddon} className="pt-2 border-t border-slate-100 space-y-3">
+          <span className="text-xs font-bold text-slate-800 block">
+            Authorized Administration: Grant Custom Purchased Add-on Key
+          </span>
+
+          <div className="flex flex-col sm:flex-row gap-2 max-w-xl">
+            <input
+              type="text"
+              value={newAddonInput}
+              onChange={(e) => setNewAddonInput(e.target.value)}
+              placeholder="e.g. custom-warehouse-sync or b2b-credit-engine"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            />
+            <button
+              type="submit"
+              disabled={grantingAddon || !newAddonInput.trim()}
+              className="px-4 py-2.5 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white font-bold text-xs transition disabled:opacity-50 flex items-center justify-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{grantingAddon ? "Granting..." : "Grant Add-on"}</span>
+            </button>
+          </div>
+          <p className="text-[11px] text-slate-400">
+            Grants configured via this interface remain active independently without altering the baseline subscription price.
+          </p>
+        </form>
+      </div>
+
+      {/* Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || license?.plan || "BASIC"}
+        recommendedTarget={upgradeTarget}
+        onSuccess={() => {
+          loadLicenseData();
+        }}
+      />
     </div>
   );
 }

@@ -21,7 +21,11 @@ import {
   Store,
   ChevronRight,
   Info,
+  Sparkles,
 } from "lucide-react";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
 
 export default function ShippingSettingsPage() {
   const [activeTab, setActiveTab] = useState<
@@ -30,6 +34,7 @@ export default function ShippingSettingsPage() {
   const [providers, setProviders] = useState<any[]>([]);
   const [canUseCourierAPIs, setCanUseCourierAPIs] = useState(true);
   const [currentPlan, setCurrentPlan] = useState("");
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saveMsg, setSaveMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -332,6 +337,11 @@ export default function ShippingSettingsPage() {
         >
           <Sliders className="w-4 h-4" />
           <span>Automated Carrier APIs</span>
+          {(!canUseCourierAPIs || currentPlan === "BASIC") && (
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+              <Lock className="w-2.5 h-2.5" /> GROW / PLUS
+            </span>
+          )}
         </button>
       </div>
 
@@ -687,6 +697,14 @@ export default function ShippingSettingsPage() {
       {/* Tab 5: Automated Carrier APIs */}
       {activeTab === "automated" && (
         <div className="space-y-6">
+          {(!canUseCourierAPIs || currentPlan === "BASIC") && (
+            <LockedFeatureBanner
+              feature="courierIntegrations"
+              currentPlan={(currentPlan as PlanTier) || "BASIC"}
+              onUpgradeSuccess={loadProviders}
+            />
+          )}
+
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
             <div>
               <h3 className="text-sm font-bold text-slate-900">Automated Courier API Connections</h3>
@@ -770,6 +788,17 @@ export default function ShippingSettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={(currentPlan as PlanTier) || "BASIC"}
+        recommendedTarget="GROW"
+        onSuccess={() => {
+          loadProviders();
+        }}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Boxes,
@@ -17,7 +17,11 @@ import {
   Plus,
   ShieldCheck,
   Zap,
+  Lock,
 } from "lucide-react";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
 
 interface AppIntegration {
   id: string;
@@ -99,6 +103,21 @@ export default function AppsDirectoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
 
+  const [permissions, setPermissions] = useState<{
+    plan: PlanTier;
+    featureMatrix: Record<string, { allowed: boolean }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/permissions")
+      .then((res) => res.json())
+      .then((perm) => {
+        if (perm && perm.plan) setPermissions(perm);
+      })
+      .catch(() => {});
+  }, []);
+
   const filtered = APPS.filter((a) => {
     const matchesSearch =
       a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,6 +155,21 @@ export default function AppsDirectoryPage() {
         </Link>
       </div>
 
+      {/* Locked Feature Notice for Basic Customers */}
+      {permissions && permissions.featureMatrix.appIntegrations?.allowed === false && (
+        <LockedFeatureBanner
+          feature="appIntegrations"
+          currentPlan={permissions.plan}
+          onUpgradeSuccess={() => {
+            fetch("/api/admin/permissions")
+              .then((res) => res.json())
+              .then((perm) => {
+                if (perm && perm.plan) setPermissions(perm);
+              });
+          }}
+        />
+      )}
+
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
         <div className="flex flex-wrap gap-1 text-xs">
@@ -168,54 +202,92 @@ export default function AppsDirectoryPage() {
 
       {/* Apps Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((app) => (
-          <div
-            key={app.id}
-            className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4 group"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-12 h-12 rounded-2xl ${app.iconBg} text-white font-black text-sm flex items-center justify-center shadow-md flex-shrink-0`}
-                  >
-                    {app.iconText}
+        {filtered.map((app) => {
+          const isAppLocked = Boolean(
+            permissions && permissions.featureMatrix.appIntegrations?.allowed === false
+          );
+
+          return (
+            <div
+              key={app.id}
+              className={`p-6 rounded-2xl border shadow-2xs transition-shadow flex flex-col justify-between space-y-4 group ${
+                isAppLocked
+                  ? "bg-slate-50/60 border-amber-200"
+                  : "bg-white border-slate-200 hover:shadow-md"
+              }`}
+            >
+              <div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-12 h-12 rounded-2xl ${app.iconBg} text-white font-black text-sm flex items-center justify-center shadow-md flex-shrink-0`}
+                    >
+                      {app.iconText}
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {app.name}
+                      </h3>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        {app.category}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
-                      {app.name}
-                    </h3>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      {app.category}
+
+                  {isAppLocked ? (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+                      <Lock className="w-2.5 h-2.5" /> GROW / PLUS
                     </span>
-                  </div>
+                  ) : app.partnerBadge ? (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                      {app.partnerBadge}
+                    </span>
+                  ) : null}
                 </div>
 
-                {app.partnerBadge && (
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
-                    {app.partnerBadge}
-                  </span>
-                )}
+                <p className="text-xs text-slate-500 mt-3 leading-relaxed">{app.description}</p>
               </div>
 
-              <p className="text-xs text-slate-500 mt-3 leading-relaxed">{app.description}</p>
-            </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Installed & Active
+                </span>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px]">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Installed & Active
-              </span>
-
-              <Link
-                href={app.link}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs flex items-center gap-1 transition-colors"
-              >
-                Configure <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+                {isAppLocked ? (
+                  <button
+                    onClick={() => setUpgradeModalOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1 transition-colors"
+                  >
+                    <Lock className="w-3 h-3" /> Upgrade
+                  </button>
+                ) : (
+                  <Link
+                    href={app.link}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs flex items-center gap-1 transition-colors"
+                  >
+                    Configure <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || "BASIC"}
+        recommendedTarget="GROW"
+        onSuccess={() => {
+          fetch("/api/admin/permissions")
+            .then((res) => res.json())
+            .then((perm) => {
+              if (perm && perm.plan) setPermissions(perm);
+            });
+        }}
+      />
     </div>
   );
 }

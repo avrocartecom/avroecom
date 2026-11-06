@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { getStorePermissions } from "@/lib/permissions";
 
 const JWT_SECRET = process.env.STORE_JWT_SECRET || "avro_store_admin_jwt_secret_token_prod_992176";
 
@@ -124,6 +125,25 @@ export async function POST(req: NextRequest) {
     if (role === "OWNER" && caller.role !== "OWNER") {
       return NextResponse.json(
         { success: false, error: "Only an existing Store Owner can grant the OWNER role." },
+        { status: 403 }
+      );
+    }
+
+    // Check subscription plan admin seats limit
+    const permissions = await getStorePermissions();
+    const maxAllowed = permissions.entitlements.maxAdminUsers || 1;
+    const currentCount = await prisma.storeAdmin.count();
+
+    if (currentCount >= maxAllowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Your current ${permissions.plan} plan allows up to ${maxAllowed} administrator account(s). Upgrade your subscription to add additional team members.`,
+          requiresUpgrade: true,
+          currentPlan: permissions.plan,
+          maxAllowed,
+          currentCount,
+        },
         { status: 403 }
       );
     }

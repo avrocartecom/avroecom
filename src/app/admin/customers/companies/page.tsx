@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Building2,
@@ -16,7 +16,11 @@ import {
   X,
   CreditCard,
   ShieldCheck,
+  Lock,
 } from "lucide-react";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
 
 interface B2BCompany {
   id: string;
@@ -78,6 +82,22 @@ export default function B2BCompaniesPage() {
   const [companies, setCompanies] = useState<B2BCompany[]>(SAMPLE_COMPANIES);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Plan Permissions & Upgrade Modal
+  const [permissions, setPermissions] = useState<{
+    plan: PlanTier;
+    featureMatrix: Record<string, { allowed: boolean }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/permissions")
+      .then((res) => res.json())
+      .then((perm) => {
+        if (perm && perm.plan) setPermissions(perm);
+      })
+      .catch(() => {});
+  }, []);
 
   // Form states
   const [name, setName] = useState("");
@@ -145,13 +165,47 @@ export default function B2BCompaniesPage() {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition-all"
+          onClick={() => {
+            if (permissions && permissions.featureMatrix.b2bCommerce?.allowed === false) {
+              setUpgradeModalOpen(true);
+              return;
+            }
+            setIsModalOpen(true);
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-sm transition-all ${
+            permissions && permissions.featureMatrix.b2bCommerce?.allowed === false
+              ? "bg-amber-500 hover:bg-amber-600 text-white"
+              : "bg-blue-600 hover:bg-blue-500 text-white"
+          }`}
         >
-          <Plus className="w-4 h-4" />
-          Add B2B Company
+          {permissions && permissions.featureMatrix.b2bCommerce?.allowed === false ? (
+            <>
+              <Lock className="w-4 h-4 text-white" />
+              Unlock B2B with Plus
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" />
+              Add B2B Company
+            </>
+          )}
         </button>
       </div>
+
+      {/* Locked Feature Notice for Basic & Grow Customers */}
+      {permissions && permissions.featureMatrix.b2bCommerce?.allowed === false && (
+        <LockedFeatureBanner
+          feature="b2bCommerce"
+          currentPlan={permissions.plan}
+          onUpgradeSuccess={() => {
+            fetch("/api/admin/permissions")
+              .then((res) => res.json())
+              .then((perm) => {
+                if (perm && perm.plan) setPermissions(perm);
+              });
+          }}
+        />
+      )}
 
       {/* Search Bar */}
       <div className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
@@ -353,6 +407,21 @@ export default function B2BCompaniesPage() {
           </div>
         </div>
       )}
+
+      {/* Plan Upgrade Modal (targeting Plus) */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || "BASIC"}
+        recommendedTarget="PLUS"
+        onSuccess={() => {
+          fetch("/api/admin/permissions")
+            .then((res) => res.json())
+            .then((perm) => {
+              if (perm && perm.plan) setPermissions(perm);
+            });
+        }}
+      />
     </div>
   );
 }

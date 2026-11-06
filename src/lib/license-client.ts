@@ -32,8 +32,8 @@ export async function getStoreLicenseStatus(): Promise<LicenseStatusResult> {
       return {
         valid: true,
         status: "ACTIVE",
-        plan: "ENTERPRISE",
-        entitlements: PLAN_DEFAULT_ENTITLEMENTS.ENTERPRISE,
+        plan: "PLUS",
+        entitlements: PLAN_DEFAULT_ENTITLEMENTS.PLUS,
         domain: process.env.STORE_DOMAIN || "localhost",
         expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         isGracePeriod: false,
@@ -45,7 +45,7 @@ export async function getStoreLicenseStatus(): Promise<LicenseStatusResult> {
     const isGrace = now < cache.gracePeriodUntil && now > cache.expiresAt;
     const isExpired = now > cache.gracePeriodUntil;
 
-    let entitlements = PLAN_DEFAULT_ENTITLEMENTS.ENTERPRISE;
+    let entitlements = PLAN_DEFAULT_ENTITLEMENTS.PLUS;
     try {
       entitlements = JSON.parse(cache.entitlementsJson);
     } catch (e) {
@@ -80,8 +80,8 @@ export async function getStoreLicenseStatus(): Promise<LicenseStatusResult> {
     return {
       valid: true,
       status: "ACTIVE",
-      plan: "ENTERPRISE",
-      entitlements: PLAN_DEFAULT_ENTITLEMENTS.ENTERPRISE,
+      plan: "PLUS",
+      entitlements: PLAN_DEFAULT_ENTITLEMENTS.PLUS,
       domain: "localhost",
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       isGracePeriod: false,

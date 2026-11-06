@@ -18,7 +18,11 @@ import {
   Eye,
   Check,
   AlertCircle,
+  Lock,
 } from "lucide-react";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
 
 interface PageItem {
   id: string;
@@ -41,6 +45,13 @@ export default function AdminPagesManager() {
   const [searchQuery, setSearchQuery] = useState("");
   const [notification, setNotification] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Subscription Permissions State
+  const [permissions, setPermissions] = useState<{
+    plan: PlanTier;
+    featureMatrix: Record<string, { allowed: boolean }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
   // Modal state
   const [editingPage, setEditingPage] = useState<PageItem | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -61,6 +72,14 @@ export default function AdminPagesManager() {
   const loadPages = async () => {
     try {
       setLoading(true);
+
+      fetch("/api/admin/permissions")
+        .then((res) => res.json())
+        .then((perm) => {
+          if (perm && perm.plan) setPermissions(perm);
+        })
+        .catch(() => {});
+
       const res = await fetch("/api/admin/pages");
       const data = await res.json();
       if (data.success) {
@@ -83,6 +102,11 @@ export default function AdminPagesManager() {
   };
 
   const handleOpenCreateModal = () => {
+    if (permissions && permissions.featureMatrix.customPages?.allowed === false) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setIsCreatingNew(true);
     setEditingPage(null);
     setFormTitle("");
@@ -97,6 +121,11 @@ export default function AdminPagesManager() {
   };
 
   const handleOpenEditModal = (page: PageItem) => {
+    if (permissions && permissions.featureMatrix.customPages?.allowed === false) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setIsCreatingNew(false);
     setEditingPage(page);
     setFormTitle(page.title);
@@ -232,12 +261,34 @@ export default function AdminPagesManager() {
 
         <button
           onClick={handleOpenCreateModal}
-          className="px-4 py-2.5 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white text-xs font-bold transition-all shadow-md flex items-center gap-2"
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 ${
+            permissions && permissions.featureMatrix.customPages?.allowed === false
+              ? "bg-amber-500 hover:bg-amber-600 text-white"
+              : "bg-[#0A192F] hover:bg-[#1E293B] text-white"
+          }`}
         >
-          <Plus className="w-4 h-4" />
-          Create Custom Page
+          {permissions && permissions.featureMatrix.customPages?.allowed === false ? (
+            <>
+              <Lock className="w-4 h-4 text-white" />
+              Upgrade to Create Pages
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" />
+              Create Custom Page
+            </>
+          )}
         </button>
       </div>
+
+      {/* Locked Feature Notice for Basic Customers */}
+      {permissions && permissions.featureMatrix.customPages?.allowed === false && (
+        <LockedFeatureBanner
+          feature="customPages"
+          currentPlan={permissions.plan}
+          onUpgradeSuccess={loadPages}
+        />
+      )}
 
       {/* Toast Notification */}
       {notification && (
@@ -741,6 +792,17 @@ export default function AdminPagesManager() {
           </div>
         </div>
       )}
+
+      {/* Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || "BASIC"}
+        recommendedTarget="GROW"
+        onSuccess={() => {
+          loadPages();
+        }}
+      />
     </div>
   );
 }

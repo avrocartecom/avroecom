@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { enforceApiFeatureAccess } from "@/lib/permissions";
 
 const DEFAULT_STANDARD_PAGES = [
   {
@@ -124,6 +125,9 @@ export async function GET() {
 // POST: Create a new custom page
 export async function POST(req: NextRequest) {
   try {
+    const guard = await enforceApiFeatureAccess("customPages");
+    if (!guard.allowed) return guard.response;
+
     const body = await req.json();
     const { title, slug, content, metaTitle, metaDescription, status = "PUBLISHED", showInFooter = true, showInNav = false } = body;
 
@@ -173,6 +177,9 @@ export async function POST(req: NextRequest) {
 // PUT: Update an existing page or upsert a standard page
 export async function PUT(req: NextRequest) {
   try {
+    const guard = await enforceApiFeatureAccess("customPages");
+    if (!guard.allowed) return guard.response;
+
     const body = await req.json();
     const { id, title, slug, content, metaTitle, metaDescription, status, showInFooter, showInNav } = body;
 
@@ -223,6 +230,9 @@ export async function PUT(req: NextRequest) {
 // DELETE: Remove a custom page
 export async function DELETE(req: NextRequest) {
   try {
+    const guard = await enforceApiFeatureAccess("customPages");
+    if (!guard.allowed) return guard.response;
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");

@@ -18,7 +18,11 @@ import {
   Loader2,
   RefreshCw,
   Sparkles,
+  Lock,
 } from "lucide-react";
+import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
+import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
+import { PlanTier } from "@/lib/license-core";
 
 interface AdminReview {
   id: string;
@@ -59,9 +63,23 @@ export default function AdminReviewsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Plan & Subscription Permissions
+  const [permissions, setPermissions] = useState<{
+    plan: PlanTier;
+    featureMatrix: Record<string, { allowed: boolean }>;
+  } | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
   const fetchReviews = async () => {
     setLoading(true);
     try {
+      fetch("/api/admin/permissions")
+        .then((res) => res.json())
+        .then((perm) => {
+          if (perm && perm.plan) setPermissions(perm);
+        })
+        .catch(() => {});
+
       const params = new URLSearchParams();
       if (search) params.set("search", search);
       if (ratingFilter !== "ALL") params.set("rating", ratingFilter);
@@ -91,6 +109,11 @@ export default function AdminReviewsPage() {
   };
 
   const handleToggleApproval = async (id: string, currentStatus: boolean) => {
+    if (permissions && permissions.featureMatrix.productReviews?.allowed === false) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setUpdatingId(id);
     try {
       const res = await fetch(`/api/admin/reviews/${id}`, {
@@ -125,6 +148,11 @@ export default function AdminReviewsPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (permissions && permissions.featureMatrix.productReviews?.allowed === false) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     if (!confirm("Are you sure you want to permanently delete this customer review?")) {
       return;
     }
@@ -184,6 +212,15 @@ export default function AdminReviewsPage() {
           <span>Refresh</span>
         </button>
       </div>
+
+      {/* Locked Feature Notice for Basic Customers */}
+      {permissions && permissions.featureMatrix.productReviews?.allowed === false && (
+        <LockedFeatureBanner
+          feature="productReviews"
+          currentPlan={permissions.plan}
+          onUpgradeSuccess={fetchReviews}
+        />
+      )}
 
       {/* Notification Toast */}
       {notification && (
@@ -439,6 +476,17 @@ export default function AdminReviewsPage() {
           </div>
         )}
       </div>
+
+      {/* Plan Upgrade Modal */}
+      <UpgradePlanModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        currentPlan={permissions?.plan || "BASIC"}
+        recommendedTarget="GROW"
+        onSuccess={() => {
+          fetchReviews();
+        }}
+      />
     </div>
   );
 }
