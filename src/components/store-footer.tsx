@@ -5,7 +5,6 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
-  CreditCard,
   Award,
   Heart,
   Check,
@@ -373,36 +372,7 @@ export default function StoreFooter({ theme }: { theme?: any }) {
           </div>
         </div>
 
-        {/* 3. Accepted Payment Methods Strip */}
-        <div
-          className="pt-6 border-t flex flex-wrap items-center justify-between gap-4 text-xs"
-          style={{ borderColor: isDarkFooter ? "rgba(255,255,255,0.1)" : "#E2E8F0" }}
-        >
-          <div className="flex items-center gap-2 text-slate-400 text-[11px]">
-            <CreditCard className="w-3.5 h-3.5" />
-            <span>Guaranteed Safe & Secure Checkout:</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {["Razorpay", "PhonePe", "UPI", "Visa", "Mastercard", "RuPay", "Net Banking", "Cash on Delivery"].map(
-              (method, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all"
-                  style={{
-                    backgroundColor: isDarkFooter ? "rgba(255,255,255,0.06)" : "#FFFFFF",
-                    borderColor: isDarkFooter ? "rgba(255,255,255,0.12)" : "#E2E8F0",
-                    color: isDarkFooter ? "#E2E8F0" : "#334155",
-                  }}
-                >
-                  {method}
-                </span>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* 4. Bottom Copyright & Powered by AVRO Only */}
+        {/* Bottom Copyright & Powered by AVRO Only */}
         <div
           className="pt-6 border-t flex flex-col sm:flex-row items-center justify-between text-xs gap-4"
           style={{

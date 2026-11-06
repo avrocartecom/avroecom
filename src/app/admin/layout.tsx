@@ -249,26 +249,8 @@ export default function StoreAdminLayout({
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-[#070F1E] flex flex-col items-center justify-center font-sans text-slate-200">
-        <div className="flex flex-col items-center gap-4 max-w-sm text-center px-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center">
-              <ShieldCheck className="w-8 h-8 text-blue-400 animate-pulse" />
-            </div>
-            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            </span>
-          </div>
-          <div>
-            <h2 className="text-sm font-bold tracking-wide uppercase text-white">
-              Authenticating Merchant Session
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Verifying encrypted credentials & store permissions...
-            </p>
-          </div>
-          <Loader2 className="w-5 h-5 text-blue-400 animate-spin mt-2" />
-        </div>
+      <div className="min-h-screen bg-[#070F1E] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
   }
