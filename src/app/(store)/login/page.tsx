@@ -209,7 +209,7 @@ export default function CustomerLoginPage() {
                   <input
                     type="email"
                     required
-                    placeholder="you@example.com"
+                    placeholder="Email address"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
@@ -224,7 +224,7 @@ export default function CustomerLoginPage() {
                   <input
                     type="password"
                     required
-                    placeholder="••••••••"
+                    placeholder="Password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
@@ -251,7 +251,7 @@ export default function CustomerLoginPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. John Doe"
+                    placeholder="Full name"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
@@ -266,7 +266,7 @@ export default function CustomerLoginPage() {
                   <input
                     type="email"
                     required
-                    placeholder="you@example.com"
+                    placeholder="Email address"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
@@ -280,7 +280,7 @@ export default function CustomerLoginPage() {
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="tel"
-                    placeholder="+91 9876543210"
+                    placeholder="Phone number"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
@@ -296,7 +296,7 @@ export default function CustomerLoginPage() {
                     type="password"
                     required
                     minLength={6}
-                    placeholder="At least 6 characters"
+                    placeholder="Password (minimum 6 characters)"
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"

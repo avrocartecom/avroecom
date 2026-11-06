@@ -291,7 +291,7 @@ export default function MetaobjectsAdminPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Care Instructions, Wash Care, Artisan Profile"
+                  placeholder="Definition name"
                   value={newName}
                   onChange={(e) => {
                     setNewName(e.target.value);
@@ -308,7 +308,7 @@ export default function MetaobjectsAdminPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. care_instructions"
+                  placeholder="type_identifier"
                   value={newType}
                   onChange={(e) => setNewType(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"

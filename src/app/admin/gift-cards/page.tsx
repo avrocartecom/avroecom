@@ -335,7 +335,7 @@ export default function GiftCardsPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ananya Patel"
+                  placeholder="Recipient name"
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300"
@@ -346,7 +346,7 @@ export default function GiftCardsPage() {
                 <label className="block text-slate-700 font-bold mb-1">Recipient Email Address</label>
                 <input
                   type="email"
-                  placeholder="ananya@example.com"
+                  placeholder="Recipient email address"
                   value={recipientEmail}
                   onChange={(e) => setRecipientEmail(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300"

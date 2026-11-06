@@ -241,7 +241,7 @@ export default function CollectionsPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Summer Running & Hydration Gear"
+                  placeholder="Collection title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-500"
@@ -314,7 +314,7 @@ export default function CollectionsPage() {
                     </select>
                     <input
                       type="text"
-                      placeholder="e.g. fitness or 1999"
+                      placeholder="Filter rule value"
                       value={ruleValue}
                       onChange={(e) => setRuleValue(e.target.value)}
                       className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white"

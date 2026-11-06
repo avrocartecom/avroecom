@@ -284,7 +284,7 @@ export default function DraftOrdersPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Ramesh Kumar"
+                    placeholder="Customer full name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-500"
@@ -294,7 +294,7 @@ export default function DraftOrdersPage() {
                   <label className="block text-slate-700 font-bold mb-1">Customer Email</label>
                   <input
                     type="email"
-                    placeholder="ramesh@example.com"
+                    placeholder="Customer email address"
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-500"
@@ -306,7 +306,7 @@ export default function DraftOrdersPage() {
                 <label className="block text-slate-700 font-bold mb-1">Customer Phone Number</label>
                 <input
                   type="tel"
-                  placeholder="+91 98765 43210"
+                  placeholder="Customer phone number"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-500"

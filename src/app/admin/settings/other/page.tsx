@@ -243,7 +243,7 @@ export default function OtherSettingsPage() {
                   type="text"
                   value={metaPixelId}
                   onChange={(e) => setMetaPixelId(e.target.value)}
-                  placeholder="e.g. 983210492817364"
+                  placeholder="Pixel ID"
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
@@ -256,7 +256,7 @@ export default function OtherSettingsPage() {
                   type="text"
                   value={tiktokPixelId}
                   onChange={(e) => setTiktokPixelId(e.target.value)}
-                  placeholder="e.g. C52781HG28..."
+                  placeholder="Pixel ID"
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>

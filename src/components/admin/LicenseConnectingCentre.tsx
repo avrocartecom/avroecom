@@ -492,7 +492,7 @@ export default function LicenseConnectingCentre() {
               <input
                 type="text"
                 required
-                placeholder="e.g. AVRO-PLUS-XXXX-XXXX-XXXX or AVRO-GROW-XXXX-XXXX-XXXX"
+                placeholder="Enter AVRO license key"
                 value={keyInput}
                 onChange={(e) => setKeyInput(e.target.value.toUpperCase())}
                 className="w-full px-4 py-3 border border-slate-300 rounded-2xl font-mono text-sm tracking-wider uppercase focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 bg-slate-50/50 focus:bg-white transition"
@@ -530,7 +530,7 @@ export default function LicenseConnectingCentre() {
                 type="text"
                 value={storeDomain}
                 onChange={(e) => setStoreDomain(e.target.value)}
-                placeholder="e.g. store.clientbrand.com or localhost:3001"
+                placeholder="Authorized store domain"
                 className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20"
               />
             </div>
@@ -993,7 +993,7 @@ export default function LicenseConnectingCentre() {
               type="text"
               value={newAddonInput}
               onChange={(e) => setNewAddonInput(e.target.value)}
-              placeholder="e.g. custom-warehouse-sync or b2b-credit-engine"
+              placeholder="Custom permission handle"
               className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
             <button

@@ -23,14 +23,14 @@ export default function StoreCheckoutPage() {
   const [loadingGateways, setLoadingGateways] = useState(true);
 
   // Form fields
-  const [name, setName] = useState("Aditya Roy");
-  const [email, setEmail] = useState("aditya.roy@example.com");
-  const [phone, setPhone] = useState("+91 98765 43210");
-  const [addressLine1, setAddressLine1] = useState("Flat 402, Green Glen Layout");
-  const [addressLine2, setAddressLine2] = useState("Outer Ring Road, Bellandur");
-  const [city, setCity] = useState("Bengaluru");
-  const [state, setState] = useState("Karnataka");
-  const [postalCode, setPostalCode] = useState("560103");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [customerNotes, setCustomerNotes] = useState("");
 
   const [loading, setLoading] = useState(false);

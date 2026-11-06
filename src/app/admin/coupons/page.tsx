@@ -138,7 +138,7 @@ export default function CouponsAdminPage() {
                   required
                   value={newCoupon.code}
                   onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
-                  placeholder="e.g. FESTIVE20"
+                  placeholder="Coupon code"
                   className="w-full px-3 py-1.5 border rounded-lg uppercase font-mono"
                 />
               </div>

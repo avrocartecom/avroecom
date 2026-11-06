@@ -321,7 +321,7 @@ export default function StoreAdminLoginPage() {
                         disabled={Boolean(lockoutSeconds && lockoutSeconds > 0) || loading}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="storeadmin@example.com or storeadmin"
+                        placeholder="Email address or username"
                         className="w-full bg-[#061120] border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                       />
                     </div>
@@ -341,7 +341,7 @@ export default function StoreAdminLoginPage() {
                         disabled={Boolean(lockoutSeconds && lockoutSeconds > 0) || loading}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••••••"
+                        placeholder="Enter password"
                         className="w-full bg-[#061120] border border-slate-700 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50 font-mono"
                       />
                       <button

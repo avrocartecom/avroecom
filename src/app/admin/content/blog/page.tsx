@@ -208,7 +208,7 @@ export default function BlogPostsPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 5 Ways to Optimize Your Workday Posture"
+                  placeholder="Article headline"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300"

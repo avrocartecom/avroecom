@@ -208,7 +208,7 @@ export default function NavigationMenusPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. New Arrivals"
+                  placeholder="Menu item label"
                   value={newLabel}
                   onChange={(e) => setNewLabel(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300"
@@ -220,7 +220,7 @@ export default function NavigationMenusPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. /shop?sort=newest or /about"
+                  placeholder="/shop, /about, or URL"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono"

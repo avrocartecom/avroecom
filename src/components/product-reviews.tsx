@@ -397,7 +397,7 @@ export function ProductReviews({
                 required
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
-                placeholder="e.g. Rahul Sharma"
+                placeholder="Your name"
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -412,7 +412,7 @@ export function ProductReviews({
                 rows={4}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Share specific details about the build, comfort, fit, battery life, design finish, or overall satisfaction..."
+                placeholder="Write your review here..."
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl p-4 text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 leading-relaxed"
               />
             </div>

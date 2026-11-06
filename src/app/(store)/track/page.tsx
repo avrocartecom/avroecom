@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Search, PackageCheck, Truck, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function OrderTrackingPage() {
-  const [orderNumber, setOrderNumber] = useState("ORD-2026-1001");
+  const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState<any | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -38,7 +38,7 @@ export default function OrderTrackingPage() {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-extrabold text-[#0A192F]">Track Your Shipment</h1>
         <p className="text-xs text-slate-500">
-          Enter your AVRO order number (e.g. ORD-2026-1001) to view real-time delivery status.
+          Enter your order number to view real-time delivery status.
         </p>
       </div>
 
@@ -46,7 +46,7 @@ export default function OrderTrackingPage() {
         <input
           type="text"
           required
-          placeholder="e.g. ORD-2026-1001"
+          placeholder="Enter order number"
           value={orderNumber}
           onChange={(e) => setOrderNumber(e.target.value)}
           className="flex-1 px-4 py-3 text-xs border border-slate-300 rounded-xl focus:outline-none uppercase font-mono"

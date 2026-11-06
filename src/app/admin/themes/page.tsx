@@ -660,7 +660,7 @@ export default function ThemesAdminPage() {
                     type="text"
                     value={customOverrides.heroBadge}
                     onChange={(e) => setCustomOverrides({ ...customOverrides, heroBadge: e.target.value })}
-                    placeholder="e.g. NEW 2026 COLLECTION"
+                    placeholder="Micro-badge text"
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                   />
                 </div>
@@ -681,7 +681,7 @@ export default function ThemesAdminPage() {
                       type="text"
                       value={customOverrides.headlineHighlight}
                       onChange={(e) => setCustomOverrides({ ...customOverrides, headlineHighlight: e.target.value })}
-                      placeholder="e.g. favourite."
+                      placeholder="Accent word / phrase"
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                     />
                   </div>
@@ -803,7 +803,7 @@ export default function ThemesAdminPage() {
                     type="text"
                     value={themeConfig.announcementBarText || ""}
                     onChange={(e) => setThemeConfig({ ...themeConfig, announcementBarText: e.target.value })}
-                    placeholder="e.g. Free express delivery on orders over ₹999 with 7-day easy returns"
+                    placeholder="Announcement bar message"
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                   />
                 </div>

@@ -649,7 +649,7 @@ export default function InventoryAdminPage() {
                   required
                   value={changeAmount}
                   onChange={(e) => setChangeAmount(e.target.value)}
-                  placeholder="e.g. 20 or -5"
+                  placeholder="Adjustment units (+/-)"
                   className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 font-bold"
                 />
               </div>
@@ -674,7 +674,7 @@ export default function InventoryAdminPage() {
                   type="text"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Physical count reconciliation"
+                  placeholder="Audit notes or reason"
                   className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -710,7 +710,7 @@ export default function InventoryAdminPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Classic Aviator Sunglasses"
+                  placeholder="Product title or SKU"
                   value={newTransferSku}
                   onChange={(e) => setNewTransferSku(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-blue-500"
@@ -783,7 +783,7 @@ export default function InventoryAdminPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Apex Garment Mills Ltd"
+                  placeholder="Vendor / Factory name"
                   value={newPoVendor}
                   onChange={(e) => setNewPoVendor(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-blue-500"

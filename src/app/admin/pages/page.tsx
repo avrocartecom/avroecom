@@ -569,7 +569,7 @@ export default function AdminPagesManager() {
                     required
                     value={formTitle}
                     onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="e.g. Sizing & Fit Guide"
+                    placeholder="Page title"
                     className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20 bg-white"
                   />
                 </div>

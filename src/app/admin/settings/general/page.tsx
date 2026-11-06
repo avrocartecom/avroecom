@@ -372,7 +372,7 @@ export default function GeneralSettingsAdminPage() {
               type="text"
               value={formData.brandName}
               onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-              placeholder="e.g. AVRO Elite Store"
+              placeholder="Store brand name"
               className="w-full max-w-md px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
             <span className="text-[10px] text-slate-400 block mt-1">
@@ -406,7 +406,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.companyAddress}
                 onChange={(e) => setFormData({ ...formData, companyAddress: e.target.value })}
-                placeholder="e.g. Technext Cyber Park, Sector 62, Industrial Area"
+                placeholder="Company street address"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
@@ -417,7 +417,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.companyCity}
                 onChange={(e) => setFormData({ ...formData, companyCity: e.target.value })}
-                placeholder="e.g. Noida / New Delhi"
+                placeholder="City"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
@@ -428,7 +428,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.companyState}
                 onChange={(e) => setFormData({ ...formData, companyState: e.target.value })}
-                placeholder="e.g. Uttar Pradesh / Delhi"
+                placeholder="State / Province"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
@@ -439,7 +439,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.companyPostalCode}
                 onChange={(e) => setFormData({ ...formData, companyPostalCode: e.target.value })}
-                placeholder="e.g. 201309"
+                placeholder="PIN / Postal code"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
@@ -450,7 +450,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.companyCountry}
                 onChange={(e) => setFormData({ ...formData, companyCountry: e.target.value })}
-                placeholder="e.g. India"
+                placeholder="Country"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
@@ -485,7 +485,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.taxId}
                 onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                placeholder="e.g. 07AAACT9021M1Z4"
+                placeholder="Tax registration / GSTIN"
                 className="w-full max-w-sm px-3.5 py-2 border border-amber-300 rounded-xl text-xs font-mono font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-500/30 bg-white"
               />
               <span className="text-[11px] text-amber-800 block mt-1">
@@ -520,7 +520,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.heroBadge}
                 onChange={(e) => setFormData({ ...formData, heroBadge: e.target.value })}
-                placeholder="e.g. EXCLUSIVE COLLECTION 2026"
+                placeholder="Exclusive collection"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
               />
             </div>
@@ -533,7 +533,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.bannerHeadline}
                 onChange={(e) => setFormData({ ...formData, bannerHeadline: e.target.value })}
-                placeholder="e.g. Find your next favorite"
+                placeholder="Headline text"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
@@ -559,7 +559,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.heroCtaText}
                 onChange={(e) => setFormData({ ...formData, heroCtaText: e.target.value })}
-                placeholder="e.g. Shop Catalog"
+                placeholder="Shop Catalog"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-800"
               />
             </div>
@@ -572,7 +572,7 @@ export default function GeneralSettingsAdminPage() {
                 type="text"
                 value={formData.heroCtaLink}
                 onChange={(e) => setFormData({ ...formData, heroCtaLink: e.target.value })}
-                placeholder="e.g. /shop"
+                placeholder="/shop"
                 className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-mono text-slate-800"
               />
             </div>

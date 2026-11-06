@@ -308,7 +308,7 @@ export default function B2BCompaniesPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Acme Tech Solutions Pvt Ltd"
+                    placeholder="Company legal name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300"

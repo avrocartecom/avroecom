@@ -58,9 +58,9 @@ export default function OrdersAdminPage() {
   const [newCustomerEmail, setNewCustomerEmail] = useState("");
   const [newCustomerPhone, setNewCustomerPhone] = useState("");
   const [newAddressLine, setNewAddressLine] = useState("");
-  const [newCity, setNewCity] = useState("New Delhi");
-  const [newState, setNewState] = useState("Delhi");
-  const [newPincode, setNewPincode] = useState("110001");
+  const [newCity, setNewCity] = useState("");
+  const [newState, setNewState] = useState("");
+  const [newPincode, setNewPincode] = useState("");
   const [newPaymentMethod, setNewPaymentMethod] = useState("COD");
   const [newPaymentStatus, setNewPaymentStatus] = useState("PENDING");
   const [newOrderStatus, setNewOrderStatus] = useState("CONFIRMED");
@@ -215,9 +215,9 @@ export default function OrdersAdminPage() {
     setNewCustomerEmail("");
     setNewCustomerPhone("");
     setNewAddressLine("");
-    setNewCity("New Delhi");
-    setNewState("Delhi");
-    setNewPincode("110001");
+    setNewCity("");
+    setNewState("");
+    setNewPincode("");
     setNewPaymentMethod("COD");
     setNewPaymentStatus("PENDING");
     setNewOrderStatus("CONFIRMED");
@@ -863,7 +863,7 @@ export default function OrdersAdminPage() {
                       required
                       value={newCustomerName}
                       onChange={(e) => setNewCustomerName(e.target.value)}
-                      placeholder="e.g. Rahul Sharma"
+                      placeholder="Customer full name"
                       className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20"
                     />
                   </div>
@@ -876,7 +876,7 @@ export default function OrdersAdminPage() {
                       required
                       value={newCustomerPhone}
                       onChange={(e) => setNewCustomerPhone(e.target.value)}
-                      placeholder="e.g. +91 9876543210"
+                      placeholder="Mobile phone number"
                       className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20"
                     />
                   </div>
@@ -886,7 +886,7 @@ export default function OrdersAdminPage() {
                       type="email"
                       value={newCustomerEmail}
                       onChange={(e) => setNewCustomerEmail(e.target.value)}
-                      placeholder="rahul@example.com"
+                      placeholder="Customer email address"
                       className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#2563EB]/20"
                     />
                   </div>
@@ -1587,7 +1587,7 @@ export default function OrdersAdminPage() {
                     type="text"
                     value={editTracking}
                     onChange={(e) => setEditTracking(e.target.value)}
-                    placeholder="e.g. DL982183921IN"
+                    placeholder="Tracking / AWB number"
                     className="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono bg-white focus:ring-2 focus:ring-[#2563EB]/20"
                   />
                 </div>

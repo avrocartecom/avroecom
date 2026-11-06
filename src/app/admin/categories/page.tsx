@@ -122,7 +122,7 @@ export default function CategoriesAdminPage() {
                   required
                   value={newCat.name}
                   onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
-                  placeholder="e.g. Footwear & Shoes"
+                  placeholder="Category name"
                   className="w-full px-3 py-1.5 border rounded-lg focus:outline-none"
                 />
               </div>

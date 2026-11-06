@@ -90,7 +90,7 @@ export default function TaxesSettingsPage() {
               <label className="block text-slate-700 font-bold mb-1">Default HSN / SAC Code</label>
               <input
                 type="text"
-                placeholder="e.g. 61091000 or 84713010"
+                placeholder="HSN / SAC Code"
                 value={defaultHsnCode}
                 onChange={(e) => setDefaultHsnCode(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm"

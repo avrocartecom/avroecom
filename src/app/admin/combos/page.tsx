@@ -653,7 +653,7 @@ export default function CombosManagementPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Complete Glow Skincare Routine (3-Pack)"
+                    placeholder="Combo package title"
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
@@ -665,7 +665,7 @@ export default function CombosManagementPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Save ₹500 with this exclusive duo pack!"
+                    placeholder="Customer headline / badge title"
                     value={formComboTitle}
                     onChange={(e) => setFormComboTitle(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"

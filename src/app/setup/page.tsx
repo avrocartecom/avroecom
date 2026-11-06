@@ -23,16 +23,19 @@ export default function SetupWizardPage() {
   const [envInfo, setEnvInfo] = useState<any>(null);
 
   // Form states
-  const [licenseKey, setLicenseKey] = useState("AVRO-GROW-8F3C7B21A90E-7C32");
-  const [domain, setDomain] = useState("localhost:3001");
+  const [licenseKey, setLicenseKey] = useState("");
+  const [domain, setDomain] = useState("");
   const [centralApiUrl, setCentralApiUrl] = useState("http://localhost:3000/api/v1");
-  const [adminName, setAdminName] = useState("Store Administrator");
-  const [adminEmail, setAdminEmail] = useState("storeadmin@example.com");
-  const [adminPassword, setAdminPassword] = useState("storeadmin123");
-  const [storeName, setStoreName] = useState("AVRO Lifestyle & Tech");
+  const [adminName, setAdminName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [storeName, setStoreName] = useState("");
   const [activatedPlan, setActivatedPlan] = useState("");
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setDomain(window.location.host);
+    }
     fetch("/api/setup")
       .then((res) => res.json())
       .then((data) => {
@@ -174,7 +177,7 @@ export default function SetupWizardPage() {
                   required
                   value={licenseKey}
                   onChange={(e) => setLicenseKey(e.target.value)}
-                  placeholder="AVRO-GROW-XXXXXX-XXXX"
+                  placeholder="Master license key"
                   className="w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-emerald-400 font-mono text-sm focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -187,7 +190,7 @@ export default function SetupWizardPage() {
                     required
                     value={domain}
                     onChange={(e) => setDomain(e.target.value)}
-                    placeholder="your-domain.com or localhost:3001"
+                    placeholder="Authorized store domain"
                     className="w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 font-mono focus:outline-none focus:border-blue-500"
                   />
                 </div>
@@ -245,6 +248,7 @@ export default function SetupWizardPage() {
                   required
                   value={storeName}
                   onChange={(e) => setStoreName(e.target.value)}
+                  placeholder="Store brand name"
                   className="w-full px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none"
                 />
               </div>
@@ -257,6 +261,7 @@ export default function SetupWizardPage() {
                     required
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
+                    placeholder="Administrator full name"
                     className="w-full px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none"
                   />
                 </div>
@@ -267,6 +272,7 @@ export default function SetupWizardPage() {
                     required
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
+                    placeholder="Email address"
                     className="w-full px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none"
                   />
                 </div>
@@ -279,6 +285,7 @@ export default function SetupWizardPage() {
                   required
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="Enter master password"
                   className="w-full px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none"
                 />
               </div>

@@ -266,7 +266,7 @@ export default function StoreAdminProfilePage() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
-                      placeholder="e.g. John Doe"
+                      placeholder="Full name"
                       className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:bg-white transition"
                     />
                   </div>
@@ -284,7 +284,7 @@ export default function StoreAdminProfilePage() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value.toLowerCase().trim())}
                       required
-                      placeholder="e.g. storeadmin"
+                      placeholder="Username"
                       className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:bg-white transition"
                     />
                   </div>
@@ -305,7 +305,7 @@ export default function StoreAdminProfilePage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      placeholder="storeadmin@example.com"
+                      placeholder="Email address"
                       className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:bg-white transition"
                     />
                   </div>
@@ -320,7 +320,7 @@ export default function StoreAdminProfilePage() {
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="Phone number"
                       className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:bg-white transition"
                     />
                   </div>

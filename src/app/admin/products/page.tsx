@@ -747,7 +747,7 @@ export default function ProductsAdminPage() {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
-                        placeholder="e.g. Ergonomic Mechanical Keyboard"
+                        placeholder="Product title"
                         className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                       />
                     </div>
@@ -812,7 +812,7 @@ export default function ProductsAdminPage() {
                         value={regularPrice}
                         onChange={(e) => setRegularPrice(e.target.value)}
                         required
-                        placeholder="e.g. 2999"
+                        placeholder="Regular price"
                         className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                       />
                     </div>
@@ -824,7 +824,7 @@ export default function ProductsAdminPage() {
                         step="0.01"
                         value={salePrice}
                         onChange={(e) => setSalePrice(e.target.value)}
-                        placeholder="Optional sale price e.g. 2499"
+                        placeholder="Optional sale price"
                         className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-black text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                       />
                     </div>
@@ -1030,7 +1030,7 @@ export default function ProductsAdminPage() {
                           type="text"
                           value={videoUrl}
                           onChange={(e) => setVideoUrl(e.target.value)}
-                          placeholder="e.g. /uploads/products/demo.mp4 or https://youtube.com/watch?v=..."
+                          placeholder="Video file path or embed URL"
                           className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                         />
                       </div>
@@ -1041,7 +1041,7 @@ export default function ProductsAdminPage() {
                           type="text"
                           value={videoTitle}
                           onChange={(e) => setVideoTitle(e.target.value)}
-                          placeholder="e.g. Official Product Unboxing & Demo"
+                          placeholder="Video caption or title"
                           className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                         />
                       </div>
@@ -1178,7 +1178,7 @@ export default function ProductsAdminPage() {
                             type="text"
                             value={comboTitle}
                             onChange={(e) => setComboTitle(e.target.value)}
-                            placeholder="e.g. Creator Master Kit (Save 20%)"
+                            placeholder="Combo package title"
                             className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-600"
                           />
                         </div>
@@ -1193,7 +1193,7 @@ export default function ProductsAdminPage() {
                               max="90"
                               value={comboDiscountPercent}
                               onChange={(e) => setComboDiscountPercent(e.target.value)}
-                              placeholder="e.g. 15"
+                              placeholder="Discount percentage"
                               className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-black text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
                             />
                           </div>

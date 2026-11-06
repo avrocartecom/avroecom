@@ -29,7 +29,7 @@ export default function StoreContactPage() {
             </div>
             <div className="flex items-center gap-2.5">
               <Mail className="w-4 h-4 text-[#2563EB]" />
-              <span>care@store.example.com</span>
+              <span>support@yourstore.com</span>
             </div>
             <div className="flex items-center gap-2.5">
               <MapPin className="w-4 h-4 text-[#2563EB]" />
@@ -57,7 +57,7 @@ export default function StoreContactPage() {
               </div>
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Order # (Optional)</label>
-                <input type="text" placeholder="e.g. ORD-2026-1001" className="w-full px-3 py-2 border rounded-lg focus:outline-none uppercase font-mono" />
+                <input type="text" placeholder="Order number" className="w-full px-3 py-2 border rounded-lg focus:outline-none uppercase font-mono" />
               </div>
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Message</label>

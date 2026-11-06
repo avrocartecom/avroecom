@@ -724,7 +724,7 @@ export default function StoreAdminUsersPage() {
                     value={addName}
                     onChange={(e) => setAddName(e.target.value)}
                     required
-                    placeholder="e.g. Sarah Connor"
+                    placeholder="Full name"
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                   />
                 </div>
@@ -736,7 +736,7 @@ export default function StoreAdminUsersPage() {
                     type="text"
                     value={addUsername}
                     onChange={(e) => setAddUsername(e.target.value.toLowerCase().trim())}
-                    placeholder="e.g. sarah_c"
+                    placeholder="Username"
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                   />
                 </div>
@@ -750,7 +750,7 @@ export default function StoreAdminUsersPage() {
                   value={addEmail}
                   onChange={(e) => setAddEmail(e.target.value)}
                   required
-                  placeholder="sarah@example.com"
+                  placeholder="Email address"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                 />
               </div>

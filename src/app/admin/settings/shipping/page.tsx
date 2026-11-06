@@ -442,7 +442,7 @@ export default function ShippingSettingsPage() {
                           updated[idx].estimatedDays = e.target.value;
                           setManualCouriers(updated);
                         }}
-                        placeholder="e.g. 2-4 Business Days"
+                        placeholder="Estimated transit timeframe"
                         className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-[11px] focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -675,7 +675,7 @@ export default function ShippingSettingsPage() {
                   type="text"
                   value={pickupConfig.readyInHours}
                   onChange={(e) => setPickupConfig({ ...pickupConfig, readyInHours: e.target.value })}
-                  placeholder="e.g. Ready in 2 Hours"
+                  placeholder="Estimated readiness timeframe"
                   className="w-full px-3 py-2 rounded-xl border border-slate-300"
                 />
               </div>

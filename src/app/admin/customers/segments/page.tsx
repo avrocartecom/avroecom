@@ -232,7 +232,7 @@ export default function CustomerSegmentsPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Festival High-Value Shoppers"
+                  placeholder="Segment name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300"
