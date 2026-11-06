@@ -88,12 +88,16 @@ export function getStoreDbUrl(): string | undefined {
   return dbUrl;
 }
 
-const storeDbUrl = getStoreDbUrl();
+const fallbackDbUrl = "postgresql://postgres:postgres@localhost:5432/store?schema=store";
+const storeDbUrl = getStoreDbUrl() || process.env.DATABASE_URL || fallbackDbUrl;
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = storeDbUrl;
+}
 
 export const prisma =
   global.storePrisma ||
   new PrismaClient({
-    ...(storeDbUrl ? { datasources: { db: { url: storeDbUrl } } } : {}),
+    datasources: { db: { url: storeDbUrl } },
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 
