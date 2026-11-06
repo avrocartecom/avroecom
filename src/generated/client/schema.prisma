@@ -1,0 +1,321 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+model StoreAdmin {
+  id           String    @id @default(cuid())
+  name         String
+  username     String?   @unique
+  email        String    @unique
+  passwordHash String
+  role         String    @default("OWNER") // OWNER, MANAGER, STAFF, SUPPORT
+  status       String    @default("ACTIVE") // ACTIVE, SUSPENDED, INACTIVE
+  phone        String?
+  avatar       String?
+  lastLoginAt  DateTime?
+  lastLoginIp  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model StoreSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model LicenseCache {
+  id               String   @id @default(cuid())
+  licenseKey       String
+  plan             String // BASIC, GROW, PLUS
+  status           String // ACTIVE, SUSPENDED, REVOKED, EXPIRED
+  domain           String
+  installationUuid String
+  entitlementsJson String // JSON string of LicenseEntitlements
+  expiresAt        DateTime
+  lastValidatedAt  DateTime
+  gracePeriodUntil DateTime
+  centralApiUrl    String
+  updatedAt        DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  parentId    String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id                   String           @id @default(cuid())
+  title                String
+  slug                 String           @unique
+  shortDescription     String?
+  description          String
+  regularPrice         Float
+  salePrice            Float?
+  sku                  String           @unique
+  stockQuantity        Int              @default(0)
+  categoryId           String?
+  category             Category?        @relation(fields: [categoryId], references: [id])
+  status               String           @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  featured             Boolean          @default(false)
+  metaTitle            String?
+  metaDescription      String?
+  videoUrl             String? // Direct video upload or YouTube/Vimeo embed
+  videoTitle           String? // Optional video caption
+  relatedProductIds    String? // JSON array string of related product IDs
+  isComboDeal          Boolean          @default(false)
+  comboProductIds      String? // JSON array string of combo bundled product IDs
+  comboDiscountPercent Float?           @default(0) // Discount percentage when bought as a combo
+  comboTitle           String? // Title of combo offer e.g. "Complete Setup Kit"
+  images               ProductImage[]
+  variants             ProductVariant[]
+  inventoryLogs        InventoryLog[]
+  reviews              ProductReview[]
+  wishlistItems        WishlistItem[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  fileType  String // "image" or "video"
+  mimeType  String?
+  fileSize  Int? // Size in bytes
+  altText   String?
+  createdAt DateTime @default(now())
+}
+
+model ProductReview {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  authorName String
+  rating     Int      @default(5)
+  comment    String
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  isPrimary Boolean @default(false)
+  sortOrder Int     @default(0)
+}
+
+model ProductVariant {
+  id             String         @id @default(cuid())
+  productId      String
+  product        Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  title          String // e.g. "Size: L, Color: Navy"
+  sku            String         @unique
+  price          Float
+  stockQuantity  Int            @default(0)
+  attributesJson String // e.g. {"Size": "L", "Color": "Navy"}
+  inventoryLogs  InventoryLog[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model InventoryLog {
+  id             String          @id @default(cuid())
+  productId      String
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId      String?
+  variant        ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  changeAmount   Int
+  resultingStock Int
+  reason         String // MANUAL_ADJUSTMENT, ORDER_PLACED, ORDER_CANCELLED, RESTOCK
+  notes          String?
+  createdAt      DateTime        @default(now())
+}
+
+model StoreCustomer {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  phone        String?
+  passwordHash String?
+  isGuest      Boolean        @default(false)
+  avatar       String?
+  lastLoginAt  DateTime?
+  addresses    Address[]
+  orders       Order[]
+  wishlist     WishlistItem[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model WishlistItem {
+  id         String         @id @default(cuid())
+  customerId String?
+  customer   StoreCustomer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  guestId    String? // Tracking for guest shoppers
+  productId  String
+  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime       @default(now())
+
+  @@index([customerId])
+  @@index([guestId])
+}
+
+model Address {
+  id           String        @id @default(cuid())
+  customerId   String
+  customer     StoreCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  fullName     String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String        @default("IN")
+  phone        String
+  isDefault    Boolean       @default(false)
+}
+
+model Order {
+  id                  String         @id @default(cuid())
+  orderNumber         String         @unique // e.g. "ORD-1001"
+  customerId          String?
+  customer            StoreCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customerName        String
+  customerEmail       String
+  customerPhone       String
+  shippingAddressJson String
+  billingAddressJson  String
+  subtotal            Float
+  discount            Float          @default(0)
+  shippingFee         Float          @default(0)
+  total               Float
+  couponCode          String?
+  orderStatus         String         @default("PENDING") // PENDING, CONFIRMED, PROCESSING, PACKED, SHIPPED, DELIVERED, CANCELLED, RETURNED, REFUNDED
+  paymentMethod       String // RAZORPAY, PHONEPE, STRIPE, COD, BANK_TRANSFER
+  paymentStatus       String         @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  transactionId       String?
+  shippingProvider    String?
+  trackingNumber      String?
+  shippingLabelUrl    String?
+  customerNotes       String?
+  adminNotes          String?
+  items               OrderItem[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  variantId    String?
+  title        String
+  variantTitle String?
+  sku          String
+  price        Float
+  quantity     Int
+  total        Float
+}
+
+model Coupon {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  discountType   String    @default("PERCENTAGE") // PERCENTAGE, FIXED
+  discountValue  Float
+  minOrderAmount Float     @default(0)
+  usageLimit     Int?
+  usedCount      Int       @default(0)
+  expiresAt      DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model PaymentGatewaySetting {
+  id          String   @id @default(cuid())
+  provider    String   @unique // RAZORPAY, PHONEPE, STRIPE, COD, BANK_TRANSFER
+  isEnabled   Boolean  @default(false)
+  isTestMode  Boolean  @default(true)
+  title       String
+  description String?
+  configJson  String   @default("{}") // Private keys, webhook secret, merchant id - strictly stored locally only
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ShippingProviderSetting {
+  id         String   @id @default(cuid())
+  provider   String   @unique // SHIPROCKET, DELHIVERY, DTDC, FLAT_RATE
+  isEnabled  Boolean  @default(false)
+  isTestMode Boolean  @default(true)
+  title      String
+  configJson String   @default("{}") // Credentials, API tokens, warehouse pincode - strictly stored locally only
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model StoreThemeSetting {
+  id                  String   @id @default(cuid())
+  activeTheme         String   @default("MODERN_MINIMAL") // MODERN_MINIMAL, BOUTIQUE_LUXURY, TECH_APEX
+  brandName           String   @default("AVRO Store")
+  logoUrl             String?
+  faviconUrl          String?
+  primaryColor        String   @default("#0f172a")
+  accentColor         String   @default("#2563eb")
+  fontFamily          String   @default("Inter, sans-serif")
+  bannerHeadline      String   @default("Your Premium Storefront")
+  bannerSubheadline   String   @default("Discover handcrafted, top-tier products.")
+  bannerImageUrl      String?
+  heroBadge           String?  @default("EXCLUSIVE COLLECTION")
+  heroCtaText         String?  @default("Shop Catalog")
+  heroCtaLink         String?  @default("/shop")
+  companyAddress      String?
+  companyCity         String?
+  companyState        String?
+  companyPostalCode   String?
+  companyCountry      String?  @default("India")
+  supportEmail        String?
+  supportPhone        String?
+  taxId               String? // GSTIN or Tax Registration Number
+  announcementBarText String?  @default("Free Shipping on Orders Over ₹999")
+  showAnnouncementBar Boolean  @default(true)
+  socialLinksJson     String?  @default("{\"facebook\":\"https://facebook.com\",\"instagram\":\"https://instagram.com\",\"twitter\":\"https://twitter.com\"}")
+  footerText          String?  @default("© 2026 AVRO Store. Powered by AVRO.")
+  updatedAt           DateTime @default(now()) @updatedAt
+}
+
+model CustomPage {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  content         String // HTML or Markdown body
+  metaTitle       String?
+  metaDescription String?
+  status          String   @default("PUBLISHED") // PUBLISHED, DRAFT
+  showInFooter    Boolean  @default(true)
+  showInNav       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

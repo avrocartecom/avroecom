@@ -1,0 +1,83 @@
+version: '3.8'
+
+# ==============================================================================
+# AVRO STOREFRONT — STANDALONE DOCKER COMPOSE STACK
+# ==============================================================================
+
+services:
+  avro-db:
+    image: postgres:16-alpine
+    container_name: avro_store_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-avro_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-avro_secure_password_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-avro_store_db}
+    volumes:
+      - avro_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-avro_user} -d ${POSTGRES_DB:-avro_store_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - avro-internal
+
+  avro-store:
+    build: .
+    container_name: avro_store_app
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-avro_user}:${POSTGRES_PASSWORD:-avro_secure_password_2026}@avro-db:5432/${POSTGRES_DB:-avro_store_db}?schema=public"
+      JWT_SECRET: ${JWT_SECRET:-avro_jwt_secure_key_change_me_production_2026}
+      ADMIN_COOKIE_SECRET: ${ADMIN_COOKIE_SECRET:-avro_cookie_secret_2026}
+      STORE_DOMAIN: ${STORE_DOMAIN:-localhost}
+      STORE_URL: ${STORE_URL:-http://localhost:3001}
+      CENTRAL_API_URL: ${CENTRAL_API_URL:-https://licensing.technext.co/api/v1}
+      AVRO_LICENSE_KEY: ${AVRO_LICENSE_KEY:-}
+    ports:
+      - "3001:3001"
+    volumes:
+      - avro_uploads:/app/public/uploads
+    depends_on:
+      avro-db:
+        condition: service_healthy
+    networks:
+      - avro-internal
+      - avro-public
+
+  avro-proxy:
+    image: caddy:2-alpine
+    container_name: avro_store_caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      STORE_DOMAIN: ${STORE_DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - avro-store
+    networks:
+      - avro-public
+
+volumes:
+  avro_pgdata:
+    driver: local
+  avro_uploads:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+
+networks:
+  avro-internal:
+    driver: bridge
+  avro-public:
+    driver: bridge

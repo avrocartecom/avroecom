@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <rect width="100" height="100" rx="22" fill="#0A192F"/>
+  <!-- Diagonal left leg of A -->
+  <line x1="26" y1="80" x2="50" y2="20" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+  <!-- Diagonal right leg of A -->
+  <line x1="74" y1="80" x2="50" y2="20" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+  <!-- Vibrant Electric Blue crossbar characteristic of AVRO logo -->
+  <line x1="33" y1="58" x2="67" y2="58" stroke="#2563EB" stroke-width="9" stroke-linecap="round"/>
+</svg>
