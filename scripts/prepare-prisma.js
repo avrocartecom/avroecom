@@ -237,6 +237,24 @@ if (process.env.VERCEL && dbUrl && (dbUrl.startsWith("postgres://") || dbUrl.sta
       },
     });
     console.log("[prepare-prisma] Schema push succeeded.");
+
+    try {
+      console.log("[prepare-prisma] Auto-seeding initial store catalog & admin...");
+      execSync("node prisma/seed.js", {
+        cwd: path.join(__dirname, ".."),
+        stdio: "inherit",
+        env: {
+          ...process.env,
+          DATABASE_URL: dbUrl,
+          DIRECT_URL: directUrl || dbUrl,
+          [urlEnvVar]: dbUrl,
+          [directEnvVar]: directUrl || dbUrl,
+        },
+      });
+      console.log("[prepare-prisma] Auto-seed completed successfully.");
+    } catch (seedErr) {
+      console.warn("[prepare-prisma] Seed notice:", seedErr.message);
+    }
   } catch (syncErr) {
     console.warn("[prepare-prisma] Non-fatal schema push notice:", syncErr.message);
   }
