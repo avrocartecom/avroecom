@@ -30,11 +30,6 @@ import {
   PackagePlus,
   UploadCloud,
   CheckCircle2,
-  Sparkles,
-  Bot,
-  Send,
-  HelpCircle,
-  Circle,
   Check,
   Globe,
 } from "lucide-react";
@@ -66,7 +61,7 @@ export default function StoreDashboardPage() {
     {
       id: "shipping",
       title: "Set up shipping zones & courier rates",
-      desc: "Configure local delivery, flat rate, or free shipping threshold.",
+      desc: "Configure manual shipping, flat rate, or free shipping threshold.",
       done: true,
       href: "/admin/settings/shipping",
       btnText: "Configure Rates",
@@ -81,11 +76,6 @@ export default function StoreDashboardPage() {
     },
   ]);
   const [showChecklist, setShowChecklist] = useState(true);
-
-  // Store AI Ask Box State
-  const [aiQuestion, setAiQuestion] = useState("");
-  const [aiAnswer, setAiAnswer] = useState<string | null>(null);
-  const [isAiThinking, setIsAiThinking] = useState(false);
 
   const completedCount = setupTasks.filter((t) => t.done).length;
   const progressPercent = Math.round((completedCount / setupTasks.length) * 100);
@@ -103,38 +93,6 @@ export default function StoreDashboardPage() {
   useEffect(() => {
     loadDashboard();
   }, []);
-
-  const handleAskAi = (promptText?: string) => {
-    const q = promptText || aiQuestion;
-    if (!q.trim()) return;
-
-    setIsAiThinking(true);
-    setAiAnswer(null);
-
-    setTimeout(() => {
-      setIsAiThinking(false);
-      const lower = q.toLowerCase();
-      if (lower.includes("dispatch") || lower.includes("pending") || lower.includes("order")) {
-        setAiAnswer(
-          `You currently have ${data?.stats?.pendingOrders || 0} orders awaiting label printing and packaging in Delhi Central Hub. 2 orders have expedited express delivery selected.`
-        );
-      } else if (lower.includes("stock") || lower.includes("inventory") || lower.includes("sku")) {
-        setAiAnswer(
-          `Catalog inventory check: 2 items are currently at or below the minimum safety threshold (10 units). We recommend raising a Purchase Order to Apex Garment Mills.`
-        );
-      } else if (lower.includes("conversion") || lower.includes("sales") || lower.includes("revenue")) {
-        setAiAnswer(
-          `Your storefront conversion rate is at 3.42%, outperforming the D2C retail benchmark (2.1%). Driving cart-abandonment recovery via WhatsApp could recover an estimated ₹14,200 this week.`
-        );
-      } else {
-        setAiAnswer(
-          `AVRO Store AI Analysis: Store telemetry is healthy. All payment gateways are responding in <120ms and SSL certificates are valid. Total gross revenue to date is ₹${(
-            data?.stats?.totalSales || 0
-          ).toLocaleString("en-IN")}.`
-        );
-      }
-    }, 700);
-  };
 
   if (loading && !data) {
     return (
@@ -295,93 +253,6 @@ export default function StoreDashboardPage() {
           </div>
         </div>
       )}
-
-      {/* Store AI Ask Box */}
-      <div className="bg-gradient-to-r from-[#0A192F] to-[#1E293B] rounded-3xl p-6 text-white shadow-md space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
-              <Bot className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-white">Ask AVRO Store Intelligence</h3>
-              <p className="text-[11px] text-slate-300">
-                Ask about today's transactions, dispatch delays, low inventory, or growth tactics.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            AI Assistant Ready
-          </span>
-        </div>
-
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={aiQuestion}
-            onChange={(e) => setAiQuestion(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleAskAi();
-            }}
-            placeholder="e.g. Which orders are waiting for shipping labels? or How is conversion today?"
-            className="flex-1 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          />
-          <button
-            onClick={() => handleAskAi()}
-            disabled={isAiThinking}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
-          >
-            {isAiThinking ? (
-              <Clock className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-            <span>Ask</span>
-          </button>
-        </div>
-
-        {/* Quick prompt pills */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
-          <span className="text-slate-400">Suggestions:</span>
-          <button
-            onClick={() => {
-              setAiQuestion("Show orders awaiting dispatch");
-              handleAskAi("Show orders awaiting dispatch");
-            }}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition"
-          >
-            Orders awaiting dispatch
-          </button>
-          <button
-            onClick={() => {
-              setAiQuestion("Which SKUs are below safety threshold?");
-              handleAskAi("Which SKUs are below safety threshold?");
-            }}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition"
-          >
-            Check low inventory SKUs
-          </button>
-          <button
-            onClick={() => {
-              setAiQuestion("How to increase conversion rate?");
-              handleAskAi("How to increase conversion rate?");
-            }}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition"
-          >
-            Conversion rate analysis
-          </button>
-        </div>
-
-        {/* AI Answer Bubble */}
-        {aiAnswer && (
-          <div className="p-4 rounded-2xl bg-white/10 border border-white/20 text-xs leading-relaxed text-slate-100 flex items-start gap-3 mt-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">{aiAnswer}</p>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Primary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

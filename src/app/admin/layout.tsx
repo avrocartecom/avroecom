@@ -88,7 +88,6 @@ export default function StoreAdminLayout({
   const storesList = [
     { name: "Main Storefront (Retail INR)", currency: "INR (₹)", active: true },
     { name: "B2B Wholesale Portal", currency: "INR (Net 30)", active: false },
-    { name: "Global Exports (USD)", currency: "USD ($)", active: false },
   ];
 
   // Notifications State
@@ -276,7 +275,6 @@ export default function StoreAdminLayout({
         { label: "Customer Segments", href: "/admin/customers/segments", icon: UserCheck },
         { label: "B2B Companies", href: "/admin/customers/companies", icon: Building2 },
         { label: "Growth & Attribution", href: "/admin/growth", icon: TrendingUp },
-        { label: "International Markets", href: "/admin/markets", icon: Globe2 },
         { label: "Analytics & Reports", href: "/admin/reports", icon: PieChart },
       ],
     },
@@ -292,7 +290,7 @@ export default function StoreAdminLayout({
       ],
     },
     {
-      group: "Apps & Channels",
+      group: "Apps & Integrations",
       items: [
         { label: "Apps Directory", href: "/admin/apps", icon: Package },
         { label: "Shiprocket Logistics", href: "/admin/apps/shiprocket", icon: Truck },
@@ -300,7 +298,6 @@ export default function StoreAdminLayout({
         { label: "Google Sheets Stream", href: "/admin/apps/google-sheets", icon: FileText },
         { label: "WhatsApp & Notifications", href: "/admin/apps/whatsapp", icon: Radio },
         { label: "Print on Demand (POD)", href: "/admin/apps/pod", icon: Layers },
-        { label: "Sales Channels Hub", href: "/admin/sales-channels", icon: Share2 },
       ],
     },
     {
@@ -659,7 +656,7 @@ export default function StoreAdminLayout({
           </div>
 
           {/* Sidebar Footer */}
-          <div className="p-3 border-t border-slate-200/80 space-y-1.5 text-xs">
+          <div className="p-3 border-t border-slate-200/80 space-y-2 text-xs">
             <button
               onClick={handleLogout}
               disabled={loggingOut}
@@ -670,6 +667,9 @@ export default function StoreAdminLayout({
                 <span>{loggingOut ? "Signing out..." : "Sign Out"}</span>
               </div>
             </button>
+            <div className="text-center pt-1 text-[9px] font-black uppercase tracking-wider text-slate-400">
+              POWERED BY AVRO BY TECHNEXT
+            </div>
           </div>
         </aside>
 
@@ -726,6 +726,9 @@ export default function StoreAdminLayout({
                 >
                   Sign Out
                 </button>
+                <div className="text-center pt-1 text-[9px] font-black uppercase tracking-wider text-slate-400">
+                  POWERED BY AVRO BY TECHNEXT
+                </div>
               </div>
             </div>
 

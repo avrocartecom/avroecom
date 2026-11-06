@@ -8,7 +8,6 @@ import {
   Database,
   Globe2,
   ShieldCheck,
-  Bot,
   Save,
   CheckCircle2,
   ChevronRight,
@@ -23,7 +22,7 @@ import {
 
 export default function OtherSettingsPage() {
   const [activeTab, setActiveTab] = useState<
-    "events" | "metafields" | "languages" | "privacy" | "ai"
+    "events" | "metafields" | "languages" | "privacy"
   >("events");
   const [notification, setNotification] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -97,12 +96,6 @@ export default function OtherSettingsPage() {
     "By accessing this website and placing an order, you agree to comply with our commercial terms and local laws."
   );
 
-  // Sulu AI Settings
-  const [aiEnabled, setAiEnabled] = useState(true);
-  const [aiTone, setAiTone] = useState("FRIENDLY");
-  const [autoGenDescriptions, setAutoGenDescriptions] = useState(true);
-  const [aiOrderChatbot, setAiOrderChatbot] = useState(true);
-
   const showToast = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3500);
@@ -154,7 +147,7 @@ export default function OtherSettingsPage() {
             Extended Store Settings & Policies
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Customer events, custom metafield definitions, languages, legal policies, and store AI configurations.
+            Customer events, custom metafield definitions, languages, and legal store policies.
           </p>
         </div>
 
@@ -216,18 +209,6 @@ export default function OtherSettingsPage() {
         >
           <ShieldCheck className="w-4 h-4" />
           <span>Privacy & Policies</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("ai")}
-          className={`pb-3 px-3 transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
-            activeTab === "ai"
-              ? "border-blue-600 text-blue-600 font-black"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Bot className="w-4 h-4" />
-          <span>Store AI & Sulu Settings</span>
         </button>
       </div>
 
@@ -468,7 +449,7 @@ export default function OtherSettingsPage() {
                       </span>
                     ) : (
                       <span className="text-[10px] font-semibold text-emerald-600">
-                        Auto-Translate Active
+                        Localization Active
                       </span>
                     )}
                   </div>
@@ -525,70 +506,6 @@ export default function OtherSettingsPage() {
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 font-medium"
               />
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 5: Sulu AI Settings */}
-      {activeTab === "ai" && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black">
-              <Bot className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">AVRO Sulu AI Commerce Engine</h3>
-              <p className="text-xs text-slate-500">
-                Automated catalog generation, copy optimization, and intelligent order routing.
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-4 text-xs">
-            <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <div>
-                <span className="font-bold text-slate-900 block">Enable Sulu AI Merchant Assistant</span>
-                <span className="text-[11px] text-slate-500">
-                  Provides smart analytics summaries and one-click copy recommendations.
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={aiEnabled}
-                onChange={(e) => setAiEnabled(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded"
-              />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <div>
-                <span className="font-bold text-slate-900 block">Auto-Generate Product SEO Copy</span>
-                <span className="text-[11px] text-slate-500">
-                  Generates optimized meta titles and descriptions when new products are saved.
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={autoGenDescriptions}
-                onChange={(e) => setAutoGenDescriptions(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded"
-              />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-              <div>
-                <span className="font-bold text-slate-900 block">Storefront AI WhatsApp & Chatbot</span>
-                <span className="text-[11px] text-slate-500">
-                  Allow customers to ask order status questions directly to Sulu AI via chat.
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={aiOrderChatbot}
-                onChange={(e) => setAiOrderChatbot(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded"
-              />
-            </label>
           </div>
         </div>
       )}

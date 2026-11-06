@@ -96,7 +96,7 @@ export default function SettingsOverviewPage() {
     },
     {
       title: "Other Settings",
-      desc: "Metafields, tracking pixels, multi-language, legal policies, and Sulu AI controls.",
+      desc: "Metafields, tracking pixels, multi-language, legal policies, and store configurations.",
       href: "/admin/settings/other",
       icon: Sliders,
       badge: "Advanced",

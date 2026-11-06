@@ -356,15 +356,20 @@ export default function CustomerLoginPage() {
           </div>
         </div>
 
-        {/* Security badges */}
-        <div className="flex items-center justify-center gap-6 text-[11px] font-medium text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>256-bit SSL Encrypted</span>
+        {/* Security badges & Powered by */}
+        <div className="space-y-2 text-center">
+          <div className="flex items-center justify-center gap-6 text-[11px] font-medium text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>256-bit SSL Encrypted</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
+              <span>Direct Store Checkout</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <ShoppingBag className="w-3.5 h-3.5 text-blue-600" />
-            <span>Direct Merchant Sovereign</span>
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            POWERED BY AVRO BY TECHNEXT
           </div>
         </div>
       </div>
