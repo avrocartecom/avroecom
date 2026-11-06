@@ -74,6 +74,14 @@ export default function StoreDashboardPage() {
       href: "/admin/support",
       btnText: "Open Support",
     },
+    {
+      id: "license",
+      title: "License Key & Central Connection Centre",
+      desc: "Connect to TECHNEXT Central licensing authority, write license key, or receive remote deployments.",
+      done: true,
+      href: "/admin/license",
+      btnText: "Open Connection Centre",
+    },
   ]);
   const [showChecklist, setShowChecklist] = useState(true);
 

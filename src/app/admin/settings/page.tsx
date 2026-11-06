@@ -32,11 +32,11 @@ export default function SettingsOverviewPage() {
       color: "bg-blue-50 text-blue-600 border-blue-200",
     },
     {
-      title: "Plans, Billing & Licensing",
-      desc: "Active subscription plan, monthly billing, offline grace state, and license keys.",
-      href: "/admin/settings/license",
+      title: "License Key & Connecting Centre",
+      desc: "Write commercial license keys, configure live Central Authority bridge, and verify entitlements.",
+      href: "/admin/license",
       icon: Key,
-      badge: "Pro Plan",
+      badge: "Cryptographic Hub",
       color: "bg-emerald-50 text-emerald-600 border-emerald-200",
     },
     {

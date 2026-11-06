@@ -306,7 +306,7 @@ export default function StoreAdminLayout({
       items: [
         { label: "Settings Overview", href: "/admin/settings", icon: Sliders },
         { label: "General & Brand", href: "/admin/settings/general", icon: Store },
-        { label: "Plans & Billing", href: "/admin/settings/license", icon: Key },
+        { label: "License & Connection Centre", href: "/admin/license", icon: Key },
         { label: "Users & Permissions", href: "/admin/users", icon: Users },
         { label: "Payment Gateways", href: "/admin/settings/payments", icon: CreditCard },
         { label: "Checkout & Accounts", href: "/admin/settings/checkout", icon: UserCheck },
@@ -324,7 +324,7 @@ export default function StoreAdminLayout({
   const unreadNotificationCount = notifications.filter((n) => !n.read).length;
 
   const isExpired = licenseInfo && !licenseInfo.valid;
-  const isLicensePage = pathname === "/admin/settings/license";
+  const isLicensePage = pathname === "/admin/license" || pathname === "/admin/settings/license";
 
   // Filter searchable items for Global Search (Cmd+K)
   const filteredSearchItems = allItems.filter((item) =>
@@ -601,6 +601,21 @@ export default function StoreAdminLayout({
             )}
           </div>
 
+          {/* License & Central Connection Pill */}
+          <Link
+            href="/admin/license"
+            className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-bold text-[11px] transition shadow-2xs ${
+              isExpired
+                ? "bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100"
+                : "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
+            }`}
+            title="License Key Writing & Central Connecting Centre"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-500" />
+            <span>{licenseInfo?.plan || "PLUS"} Active</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </Link>
+
           {/* Central Support Pill */}
           <Link
             href="/admin/support"
@@ -805,7 +820,7 @@ export default function StoreAdminLayout({
                   </p>
                 </div>
                 <Link
-                  href="/admin/settings/license"
+                  href="/admin/license"
                   className="w-full py-3 px-4 rounded-xl bg-[#0A192F] text-white text-xs font-bold transition flex items-center justify-center gap-2"
                 >
                   <Key className="w-4 h-4 text-amber-400" />

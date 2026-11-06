@@ -302,4 +302,16 @@ export async function getStoreBroadcasts(plan?: string): Promise<any[]> {
   return [];
 }
 
+/**
+ * Disconnects and removes local license cache
+ */
+export async function disconnectStoreLicense(): Promise<{ success: boolean; message: string }> {
+  try {
+    await prisma.licenseCache.deleteMany();
+    return { success: true, message: "License key successfully disconnected from store." };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
 
