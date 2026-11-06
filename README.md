@@ -1,4 +1,4 @@
-# AVRO Storefront & Merchant Backoffice Engine
+# AVRO Storefront & Merchant Admin Panel Engine
 
 > **Self-hosted, autonomous commerce platform engineered for independent merchants, fast-growing brands, and digital creators.**
 
@@ -21,9 +21,9 @@ Developed by **TECHNEXT TECHNOLOGIES**, **AVRO** gives you complete ownership ov
   - PhonePe (Direct UPI, QR code)
   - Direct Bank Transfer / Manual UPI
 
-### Merchant Administration Backoffice (`/admin`)
+### Merchant Administration Panel (`/admin`)
 - **Order Fulfillment & Management**:
-  - Create manual & draft orders directly from the backoffice with catalog product picker.
+  - Create manual & draft orders directly from the admin panel with catalog product picker.
   - Edit existing orders (customer contact details, shipping addresses, fulfillment statuses, line items).
   - Print industry-standard thermal **4"x6" courier shipping labels**.
   - Generate GST-compliant **tax invoices**.
@@ -85,8 +85,8 @@ npm run db:seed
 npm run dev
 ```
 - Storefront: `http://localhost:3001`
-- Admin Backoffice: `http://localhost:3001/admin`
-- Default Backoffice Login:
+- Admin Panel: `http://localhost:3001/admin`
+- Default Admin Login:
   - **Email**: `storeadmin@example.com`
   - **Password**: `storeadmin123`
 

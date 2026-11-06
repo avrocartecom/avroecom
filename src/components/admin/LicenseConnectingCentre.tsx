@@ -269,7 +269,7 @@ export default function LicenseConnectingCentre() {
             License Key Writing & Central Connecting Centre
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
-            Authorize your independent store backoffice, configure live Central Authority bridge, write commercial keys, or receive remote deployments.
+            Authorize your independent store admin panel, configure live Central Authority bridge, write commercial keys, or receive remote deployments.
           </p>
         </div>
 

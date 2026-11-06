@@ -36,7 +36,7 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5"
   },
-  "description": "AVRO — Self-Hosted Customer Storefront & Merchant Backoffice Engine",
+  "description": "AVRO — Self-Hosted Customer Storefront & Merchant Admin Panel Engine",
   "repository": {
     "type": "git",
     "url": "https://github.com/technexttechnologies/avrostore.git"

@@ -799,7 +799,7 @@ export default function StoreAdminLayout({
             <div className="bg-rose-50 border-b border-rose-200 px-6 py-3 text-xs text-rose-900 flex items-center gap-2 font-semibold">
               <ShieldAlert className="w-4 h-4 text-rose-600 flex-shrink-0" />
               <span>
-                <strong>CRITICAL: STOREFRONT & BACKOFFICE LOCKED.</strong> Your license has expired ({new Date(licenseInfo?.expiresAt).toLocaleDateString()}). Enter your renewed license key below to restore store operations.
+                <strong>CRITICAL: STOREFRONT & ADMIN PANEL LOCKED.</strong> Your license has expired ({new Date(licenseInfo?.expiresAt).toLocaleDateString()}). Enter your renewed license key below to restore store operations.
               </span>
             </div>
           )}

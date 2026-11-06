@@ -163,7 +163,7 @@ export default function StoreAdminProfilePage() {
         return;
       }
 
-      setPasswordMsg({ type: "success", text: "Password changed successfully. Your backoffice session remains active." });
+      setPasswordMsg({ type: "success", text: "Password changed successfully. Your admin session remains active." });
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -200,7 +200,7 @@ export default function StoreAdminProfilePage() {
             Administrator Profile & Security
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Manage your personal login username, email address, password, and backoffice authentication credentials.
+            Manage your personal login username, email address, password, and admin panel authentication credentials.
           </p>
         </div>
 
@@ -353,7 +353,7 @@ export default function StoreAdminProfilePage() {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-slate-900">Password & Security Credentials</h2>
-                  <p className="text-[11px] text-slate-400">Update your backoffice login password with instant cryptographic verification</p>
+                  <p className="text-[11px] text-slate-400">Update your admin login password with instant cryptographic verification</p>
                 </div>
               </div>
               <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">

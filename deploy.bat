@@ -1,7 +1,7 @@
 @echo off
 title AVRO Storefront Deployer
 echo ================================================================
-echo       AVRO STOREFRONT & MERCHANT BACKOFFICE DEPLOYER
+echo       AVRO STOREFRONT & MERCHANT ADMIN PANEL DEPLOYER
 echo             TECHNEXT TECHNOLOGIES COMMERCE ENGINE
 echo ================================================================
 echo.
@@ -26,7 +26,7 @@ if "%MODE%"=="1" (
     echo.
     echo ================================================================
     echo Storefront Running at: http://localhost:3001
-    echo Admin Backoffice:      http://localhost:3001/admin/login
+    echo Admin Panel:           http://localhost:3001/admin/login
     echo Default Admin Login:   storeadmin@example.com / storeadmin123
     echo ================================================================
     pause

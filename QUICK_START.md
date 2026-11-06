@@ -13,7 +13,7 @@ npm run db:seed
 npm run dev
 ```
 
-### 3. Log In to Backoffice
+### 3. Log In to Admin Panel
 - Open: `http://localhost:3001/admin`
 - Email: `storeadmin@example.com`
 - Password: `storeadmin123`

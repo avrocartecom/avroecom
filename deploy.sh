@@ -12,7 +12,7 @@ NC='\033[0m'
 
 clear
 echo -e "${CYAN}================================================================${NC}"
-echo -e "${CYAN}       AVRO STOREFRONT & MERCHANT BACKOFFICE DEPLOYER           ${NC}"
+echo -e "${CYAN}       AVRO STOREFRONT & MERCHANT ADMIN PANEL DEPLOYER          ${NC}"
 echo -e "${CYAN}             TECHNEXT TECHNOLOGIES COMMERCE ENGINE              ${NC}"
 echo -e "${CYAN}================================================================${NC}"
 echo ""
@@ -36,7 +36,7 @@ if [ "$MODE" = "1" ]; then
     docker compose up -d --build
     echo -e "\n${GREEN}================================================================${NC}"
     echo -e "${GREEN}Storefront Running at: http://localhost:3001${NC}"
-    echo -e "${GREEN}Admin Backoffice:      http://localhost:3001/admin/login${NC}"
+    echo -e "${GREEN}Admin Panel:           http://localhost:3001/admin/login${NC}"
     echo -e "${GREEN}Default Admin Login:   storeadmin@example.com / storeadmin123${NC}"
     echo -e "${GREEN}================================================================${NC}"
     exit 0

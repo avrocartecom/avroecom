@@ -87,7 +87,7 @@ export default function AdminGuidePage() {
       summary: "Master the admin navigation, universal search, notifications, shortcuts, and mobile view.",
       content: {
         overview:
-          "The AVRO administrative backoffice is organized into intuitive operational groups: Commerce Operations, Growth & Design, and Store Settings.",
+          "The AVRO administrative admin panel is organized into intuitive operational groups: Commerce Operations, Growth & Design, and Store Settings.",
         steps: [
           "Universal Search: Press Ctrl + K (or ⌘ + K) anywhere to search orders, products, and jump across settings.",
           "Sidebar Organization: Orders, Products, Combos, Categories, Inventory, and Customers are accessible from the left rail.",

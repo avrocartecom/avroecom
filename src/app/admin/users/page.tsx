@@ -366,7 +366,7 @@ export default function StoreAdminUsersPage() {
             Store Administrators & Multi-User Access
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Manage multi-user backoffice logins, assign roles, enforce security policies, and configure access permissions.
+            Manage multi-user admin logins, assign roles, enforce security policies, and configure access permissions.
           </p>
         </div>
 
@@ -403,7 +403,7 @@ export default function StoreAdminUsersPage() {
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Administrators</span>
           <span className="text-2xl font-black text-slate-900 mt-1 block">{totalUsers}</span>
-          <span className="text-[10px] text-slate-500 mt-0.5 block">Active backoffice users</span>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Active admin users</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
@@ -1050,7 +1050,7 @@ export default function StoreAdminUsersPage() {
             </div>
 
             <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-              Are you sure you want to permanently remove <strong>{selectedUser.name}</strong> (@{selectedUser.username}) from the backoffice?
+              Are you sure you want to permanently remove <strong>{selectedUser.name}</strong> (@{selectedUser.username}) from the admin panel?
               Their active sessions will be terminated immediately.
             </p>
 

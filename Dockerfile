@@ -1,5 +1,5 @@
 # ==============================================================================
-# AVRO CUSTOMER STOREFRONT & BACKOFFICE — PRODUCTION DOCKERFILE
+# AVRO CUSTOMER STOREFRONT & ADMIN PANEL — PRODUCTION DOCKERFILE
 # ==============================================================================
 
 FROM node:20-alpine AS base

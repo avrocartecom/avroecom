@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Backoffice locked due to multiple failed login attempts. Retry in ${remainingSecs} seconds.`,
+          error: `Admin panel locked due to multiple failed login attempts. Retry in ${remainingSecs} seconds.`,
           isLocked: true,
           remainingSeconds: remainingSecs,
         },
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         require2FA: true,
-        message: "Credentials verified. Please enter your 6-digit backoffice security code.",
+        message: "Credentials verified. Please enter your 6-digit admin security code.",
         user: {
           id: admin.id,
           username: admin.username || admin.email.split("@")[0],
@@ -225,7 +225,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      message: "Store backoffice session active.",
+      message: "Store admin panel session active.",
       token,
       user: {
         id: admin.id,

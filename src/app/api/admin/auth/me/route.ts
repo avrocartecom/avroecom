@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const token = tokenCookie || (authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : null);
 
     if (!token) {
-      return NextResponse.json({ authenticated: false, error: "No active backoffice session." }, { status: 401 });
+      return NextResponse.json({ authenticated: false, error: "No active admin session." }, { status: 401 });
     }
 
     try {
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
         },
       });
     } catch (jwtErr) {
-      return NextResponse.json({ authenticated: false, error: "Backoffice session expired or invalid." }, { status: 401 });
+      return NextResponse.json({ authenticated: false, error: "Admin session expired or invalid." }, { status: 401 });
     }
   } catch (err: any) {
     return NextResponse.json({ authenticated: false, error: "Authentication check failed." }, { status: 500 });

@@ -117,7 +117,7 @@ export default function StoreAdminLoginPage() {
         if (data.isLocked && data.remainingSeconds) {
           setLockoutSeconds(data.remainingSeconds);
         }
-        setErrorMessage(data.error || "Authentication failed. Check your store backoffice credentials.");
+        setErrorMessage(data.error || "Authentication failed. Check your admin credentials.");
         return;
       }
 
@@ -172,7 +172,7 @@ export default function StoreAdminLoginPage() {
     e.preventDefault();
     const fullPin = twoFactorPin.join("");
     if (fullPin.length !== 6) {
-      setErrorMessage("Please enter all 6 digits of your backoffice security PIN.");
+      setErrorMessage("Please enter all 6 digits of your admin security PIN.");
       return;
     }
 
@@ -198,7 +198,7 @@ export default function StoreAdminLoginPage() {
         return;
       }
 
-      setSuccessMessage("Backoffice session authorized! Redirecting to merchant administration...");
+      setSuccessMessage("Admin session authorized! Redirecting to admin panel...");
       setTimeout(() => {
         router.push("/admin");
       }, 700);
@@ -218,7 +218,7 @@ export default function StoreAdminLoginPage() {
       {/* Top Header Bar */}
       <header className="border-b border-slate-800/80 bg-[#0A1628]/80 backdrop-blur-md px-6 py-3.5 flex items-center justify-between text-xs z-10">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
+          <div className="flex items-center gap-2">
             <div className="bg-white px-2 py-0.5 rounded-md shadow-xs">
               <img
                 src={storeBrand.logoUrl || "/avro-logo.png"}
@@ -229,25 +229,14 @@ export default function StoreAdminLoginPage() {
                 }}
               />
             </div>
-            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 transition-colors uppercase tracking-wider">
-              STORE BACKOFFICE
+            <span className="text-[11px] font-black text-slate-300 uppercase tracking-wider">
+              ADMIN PANEL
             </span>
-          </Link>
-          <span className="hidden sm:inline-block h-3.5 w-px bg-slate-700" />
-          <span className="hidden sm:flex items-center gap-1.5 text-slate-400 text-[11px]">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            TLS 256-Bit Cryptographic Boundary
-          </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 text-xs">
-          <Link
-            href="/"
-            className="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1 font-semibold"
-          >
-            <span>Live Storefront</span>
-            <ArrowRight className="w-3 h-3" />
-          </Link>
+        <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          POWERED BY AVRO BY TECHNEXT
         </div>
       </header>
 
@@ -294,7 +283,7 @@ export default function StoreAdminLoginPage() {
 
                 <div>
                   <h1 className="text-lg font-black tracking-tight text-white">
-                    {storeBrand.name} Backoffice
+                    {storeBrand.name} Admin Panel
                   </h1>
                   <p className="text-xs text-slate-400 mt-1">
                     {step === "CREDENTIALS"
@@ -435,7 +424,7 @@ export default function StoreAdminLoginPage() {
                       <Fingerprint className="w-5 h-5" />
                     </div>
                     <div className="text-xs">
-                      <p className="font-semibold text-white">Backoffice 2FA Challenge</p>
+                      <p className="font-semibold text-white">Admin 2FA Security Challenge</p>
                       <p className="text-[11px] text-slate-400">
                         Enter the 6-digit verification PIN to authorize this session.
                       </p>
@@ -478,7 +467,7 @@ export default function StoreAdminLoginPage() {
                       ) : (
                         <>
                           <ShieldCheck className="w-4 h-4" />
-                          <span>Authorize Backoffice Access</span>
+                          <span>Authorize Admin Access</span>
                         </>
                       )}
                     </button>
@@ -512,17 +501,10 @@ export default function StoreAdminLoginPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-3.5 px-6 text-center text-slate-500 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 z-10 bg-[#060D1A]/90">
+      <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-slate-500 text-xs flex items-center justify-center z-10 bg-[#060D1A]/90">
         <span className="font-semibold text-slate-400">
-          POWERED BY AVRO BY TECHNEXT • SECURED MERCHANT BACKOFFICE
+          POWERED BY AVRO BY TECHNEXT
         </span>
-        <div className="flex items-center gap-4 text-[11px] text-slate-500">
-          <span>Single-Store Dedicated Node</span>
-          <span>•</span>
-          <Link href="/" className="hover:text-slate-300">
-            Storefront
-          </Link>
-        </div>
       </footer>
     </div>
   );

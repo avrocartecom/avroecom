@@ -246,7 +246,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
     return NextResponse.json({
       success: true,
-      message: `Administrator "${targetUser.name}" has been removed from the backoffice.`,
+      message: `Administrator "${targetUser.name}" has been removed from the admin panel.`,
     });
   } catch (err: any) {
     console.error("DELETE /api/admin/users/[id] error:", err);
