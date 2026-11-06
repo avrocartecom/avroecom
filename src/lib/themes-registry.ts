@@ -940,9 +940,90 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
   },
 ];
 
-export function getThemeById(idOrCode: string): AvroThemeDefinition {
-  const found = AVRO_THEMES.find(
-    (t) => t.id === idOrCode || t.code === idOrCode || t.id.toLowerCase() === idOrCode.toLowerCase()
+export function getThemeById(idOrCode: string, themeSetting?: any): AvroThemeDefinition {
+  return resolveStoreTheme(idOrCode, themeSetting);
+}
+
+export function extractCustomThemes(themeSetting?: any): AvroThemeDefinition[] {
+  if (!themeSetting) return [];
+  let list: any[] = [];
+  try {
+    if (Array.isArray(themeSetting.customThemes)) {
+      list = themeSetting.customThemes;
+    } else if (themeSetting.customThemesJson) {
+      list = JSON.parse(themeSetting.customThemesJson);
+    } else if (themeSetting.socialLinksJson) {
+      const parsed =
+        typeof themeSetting.socialLinksJson === "string"
+          ? JSON.parse(themeSetting.socialLinksJson)
+          : themeSetting.socialLinksJson;
+      if (Array.isArray(parsed?.customThemes)) {
+        list = parsed.customThemes;
+      }
+    }
+  } catch (e) {
+    list = [];
+  }
+  return Array.isArray(list) ? list : [];
+}
+
+export function getAllThemes(themeSetting?: any): AvroThemeDefinition[] {
+  const custom = extractCustomThemes(themeSetting);
+  return [...custom, ...AVRO_THEMES];
+}
+
+export function resolveStoreTheme(
+  idOrCode?: string | null,
+  themeSetting?: any
+): AvroThemeDefinition {
+  const all = getAllThemes(themeSetting);
+  const target = String(idOrCode || themeSetting?.activeTheme || "AVRO_SIGNATURE").trim();
+
+  const found = all.find(
+    (t) =>
+      t.code === target ||
+      t.id === target ||
+      t.code.toLowerCase() === target.toLowerCase() ||
+      t.id.toLowerCase() === target.toLowerCase() ||
+      (target.toUpperCase() === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
   );
+
   return found || AVRO_THEMES[12]; // Fallback to AVRO Signature
+}
+
+export function createDefaultCustomTheme(
+  name?: string,
+  basePresetCode?: string
+): AvroThemeDefinition {
+  const base =
+    AVRO_THEMES.find((t) => t.code === basePresetCode || t.id === basePresetCode) ||
+    AVRO_THEMES[12]; // AVRO Signature
+
+  const timestamp = Date.now();
+  const id = `custom-${timestamp}`;
+  const code = `CUSTOM_${timestamp}`;
+  const themeName = name?.trim() || "My Branded Theme";
+
+  return {
+    id,
+    code,
+    name: themeName,
+    industry: base.industry || "Custom Bespoke Store",
+    referenceUrl: "#",
+    referenceDisplay: "Custom Merchant Theme",
+    tagline: `Exclusive branded design for ${themeName}`,
+    description: `A custom-crafted merchant theme with bespoke typography, curated brand palettes, customized hero banners, and tailor-made layout styling.`,
+    isIncludedInFree: false,
+    palette: { ...base.palette },
+    typography: { ...base.typography },
+    hero: {
+      ...base.hero,
+      headline: `Welcome to ${themeName}`,
+      subheadline: `Discover handcrafted essentials, curated new drops, and signature collections.`,
+    },
+    announcementBar: { ...base.announcementBar },
+    trustBadges: [...base.trustBadges],
+    sampleCategories: [...base.sampleCategories],
+    sampleProducts: [...base.sampleProducts],
+  };
 }

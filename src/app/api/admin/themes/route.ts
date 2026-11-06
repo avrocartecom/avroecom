@@ -40,12 +40,23 @@ export async function GET() {
               { title: "Verified Authentic", subtitle: "100% Genuine manufacturer guarantee", icon: "award" },
               { title: "7-Day Easy Replacement", subtitle: "Zero hassle doorstep resolution", icon: "refresh" },
             ],
+            customThemes: [],
           }),
         },
       });
     }
 
-    return NextResponse.json({ success: true, theme: themeSetting });
+    let customThemes: any[] = [];
+    if (themeSetting?.socialLinksJson) {
+      try {
+        const parsed = JSON.parse(themeSetting.socialLinksJson);
+        if (Array.isArray(parsed?.customThemes)) {
+          customThemes = parsed.customThemes;
+        }
+      } catch (e) {}
+    }
+
+    return NextResponse.json({ success: true, theme: themeSetting, customThemes });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -84,10 +95,39 @@ export async function PUT(req: NextRequest) {
       announcementBarText,
       showAnnouncementBar,
       socialLinksJson,
+      customThemes,
       footerText,
     } = body;
 
     const themeSetting = await prisma.storeThemeSetting.findFirst();
+
+    // Prepare robust socialLinksJson preserving customThemes
+    let socialObj: any = {};
+    if (typeof socialLinksJson === "string") {
+      try {
+        socialObj = JSON.parse(socialLinksJson);
+      } catch (e) {
+        socialObj = {};
+      }
+    } else if (typeof socialLinksJson === "object" && socialLinksJson !== null) {
+      socialObj = { ...socialLinksJson };
+    }
+
+    if (Array.isArray(customThemes)) {
+      socialObj.customThemes = customThemes;
+    } else if (Array.isArray(body?.customThemes)) {
+      socialObj.customThemes = body.customThemes;
+    } else if (themeSetting?.socialLinksJson && !socialObj.customThemes) {
+      try {
+        const existing = JSON.parse(themeSetting.socialLinksJson);
+        if (Array.isArray(existing?.customThemes)) {
+          socialObj.customThemes = existing.customThemes;
+        }
+      } catch (e) {}
+    }
+
+    const finalSocialLinksJson = JSON.stringify(socialObj);
+
     const updated = await prisma.storeThemeSetting.upsert({
       where: { id: themeSetting ? themeSetting.id : "cuid_placeholder" },
       update: {
@@ -114,7 +154,7 @@ export async function PUT(req: NextRequest) {
         taxId,
         announcementBarText,
         showAnnouncementBar: Boolean(showAnnouncementBar),
-        socialLinksJson: typeof socialLinksJson === "string" ? socialLinksJson : JSON.stringify(socialLinksJson || {}),
+        socialLinksJson: finalSocialLinksJson,
         footerText,
       },
       create: {
@@ -141,13 +181,18 @@ export async function PUT(req: NextRequest) {
         taxId,
         announcementBarText: announcementBarText || "⚡ Free Shipping on orders over ₹999",
         showAnnouncementBar: Boolean(showAnnouncementBar),
-        socialLinksJson: typeof socialLinksJson === "string" ? socialLinksJson : JSON.stringify(socialLinksJson || {}),
+        socialLinksJson: finalSocialLinksJson,
         footerText: footerText || "© 2026 AVRO Store. Powered by AVRO.",
       },
     });
 
     invalidateStoreThemeCache();
-    return NextResponse.json({ success: true, message: "Theme customization saved & deployed!", theme: updated });
+    return NextResponse.json({
+      success: true,
+      message: "Theme customization saved & deployed!",
+      theme: updated,
+      customThemes: socialObj.customThemes || [],
+    });
   } catch (err: any) {
     console.error("Theme PUT error:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

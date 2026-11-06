@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
+import { AVRO_THEMES, AvroThemeDefinition, resolveStoreTheme } from "@/lib/themes-registry";
 import {
   Palette,
   Check,
@@ -29,15 +29,7 @@ export function ThemePreviewDock({ initialThemeCode }: { initialThemeCode?: stri
   }
 
   const activeThemeCode = currentParam || initialThemeCode || "AVRO_SIGNATURE";
-  const activeTheme =
-    AVRO_THEMES.find(
-      (t) =>
-        t.code === activeThemeCode ||
-        t.id === activeThemeCode ||
-        t.id === currentParam ||
-        t.code.toLowerCase() === activeThemeCode.toLowerCase() ||
-        (activeThemeCode.toUpperCase() === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
-    ) || AVRO_THEMES[12];
+  const activeTheme = resolveStoreTheme(activeThemeCode);
 
   const handleSelectTheme = (themeId: string) => {
     const params = new URLSearchParams(searchParams.toString());

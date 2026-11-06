@@ -29,8 +29,13 @@ import {
   Loader2,
   Lock,
   Sparkles,
+  Plus,
+  Trash2,
+  Copy,
+  Pencil,
+  X,
 } from "lucide-react";
-import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
+import { AVRO_THEMES, AvroThemeDefinition, resolveStoreTheme, getAllThemes } from "@/lib/themes-registry";
 import { LockedFeatureBanner } from "@/components/admin/LockedFeatureBanner";
 import { UpgradePlanModal } from "@/components/admin/UpgradePlanModal";
 import { PlanTier } from "@/lib/license-core";
@@ -65,7 +70,7 @@ export default function ThemesAdminPage() {
     ],
   });
 
-  const [activeTab, setActiveTab] = useState<"EDITOR" | "LIBRARY">("EDITOR");
+  const [activeTab, setActiveTab] = useState<"EDITOR" | "CUSTOM" | "LIBRARY">("EDITOR");
   const [editorSection, setEditorSection] = useState<"COLORS" | "TYPOGRAPHY" | "HERO" | "ANNOUNCEMENT" | "TRUST" | "FOOTER">("COLORS");
   const [viewportMode, setViewportMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [loading, setLoading] = useState(true);
@@ -74,6 +79,39 @@ export default function ThemesAdminPage() {
   const [isUploadingHero, setIsUploadingHero] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("ALL");
   const [activatingCode, setActivatingCode] = useState<string | null>(null);
+
+  // Custom Theme Management & Builder States
+  const [customThemes, setCustomThemes] = useState<AvroThemeDefinition[]>([]);
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [editingThemeId, setEditingThemeId] = useState<string | null>(null);
+
+  const [ctName, setCtName] = useState("");
+  const [ctIndustry, setCtIndustry] = useState("Fashion & Apparel");
+  const [ctTagline, setCtTagline] = useState("");
+  const [ctBasePreset, setCtBasePreset] = useState("AVRO_SIGNATURE");
+  const [ctPrimary, setCtPrimary] = useState("#0A192F");
+  const [ctAccent, setCtAccent] = useState("#2563EB");
+  const [ctBackground, setCtBackground] = useState("#FAFAFA");
+  const [ctCardBg, setCtCardBg] = useState("#FFFFFF");
+  const [ctText, setCtText] = useState("#0F172A");
+  const [ctTextMuted, setCtTextMuted] = useState("#64748B");
+  const [ctBorder, setCtBorder] = useState("#E2E8F0");
+  const [ctHeaderBg, setCtHeaderBg] = useState("#FFFFFF");
+  const [ctFooterBg, setCtFooterBg] = useState("#0A192F");
+  const [ctFontFamily, setCtFontFamily] = useState("Inter, -apple-system, sans-serif");
+  const [ctHeadingClass, setCtHeadingClass] = useState("font-sans tracking-tight font-extrabold");
+  const [ctButtonRadius, setCtButtonRadius] = useState("rounded-xl");
+  const [ctBadgeRadius, setCtBadgeRadius] = useState("rounded-full");
+  const [ctHeroHeadline, setCtHeroHeadline] = useState("");
+  const [ctHeroHighlight, setCtHeroHighlight] = useState("");
+  const [ctHeroSubheadline, setCtHeroSubheadline] = useState("");
+  const [ctHeroBadge, setCtHeroBadge] = useState("");
+  const [ctHeroCtaPrimary, setCtHeroCtaPrimary] = useState("Shop Collection");
+  const [ctHeroImageUrl, setCtHeroImageUrl] = useState("https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=85");
+  const [ctAnnouncementText, setCtAnnouncementText] = useState("Free express delivery on all orders over ₹999 with 7-day easy returns");
+  const [ctAnnouncementBg, setCtAnnouncementBg] = useState("#0A192F");
+  const [ctAnnouncementTextColor, setCtAnnouncementTextColor] = useState("#FFFFFF");
+  const [ctShowAnnouncement, setCtShowAnnouncement] = useState(true);
 
   const categories = [
     { key: "ALL", label: "All 13 Presets" },
@@ -123,14 +161,22 @@ export default function ThemesAdminPage() {
       .then((data) => {
         if (data.success && data.theme) {
           setThemeConfig(data.theme);
+          let loadedCustom: AvroThemeDefinition[] = [];
+          if (Array.isArray(data.customThemes)) {
+            loadedCustom = data.customThemes;
+          }
           if (data.theme.socialLinksJson) {
             try {
               const parsed = JSON.parse(data.theme.socialLinksJson);
+              if (Array.isArray(parsed?.customThemes) && parsed.customThemes.length > 0) {
+                loadedCustom = parsed.customThemes;
+              }
               setCustomOverrides((prev: any) => ({ ...prev, ...parsed }));
             } catch (e) {
               // ignore
             }
           }
+          setCustomThemes(loadedCustom);
         }
       })
       .finally(() => setLoading(false));
@@ -210,7 +256,11 @@ export default function ThemesAdminPage() {
 
     const payload = {
       ...themeConfig,
-      socialLinksJson: JSON.stringify(customOverrides),
+      customThemes,
+      socialLinksJson: JSON.stringify({
+        ...customOverrides,
+        customThemes,
+      }),
     };
 
     try {
@@ -231,6 +281,355 @@ export default function ThemesAdminPage() {
     }
   };
 
+  // ----------------------------------------------------
+  // CUSTOM THEMES ENGINE (GROW & PLUS UNLOCKED)
+  // ----------------------------------------------------
+
+  const handleOpenCreateNewTheme = (basePresetCode?: string) => {
+    if (permissions?.plan === "BASIC") {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
+    const base =
+      AVRO_THEMES.find((t) => t.code === basePresetCode || t.id === basePresetCode) ||
+      AVRO_THEMES[12]; // Default AVRO Signature
+
+    setEditingThemeId(null);
+    setCtName("");
+    setCtIndustry(base.industry || "Fashion & Apparel");
+    setCtTagline("");
+    setCtBasePreset(base.code);
+    setCtPrimary(base.palette.primary);
+    setCtAccent(base.palette.accent);
+    setCtBackground(base.palette.background);
+    setCtCardBg(base.palette.cardBg);
+    setCtText(base.palette.text);
+    setCtTextMuted(base.palette.textMuted);
+    setCtBorder(base.palette.border);
+    setCtHeaderBg(base.palette.headerBg || "#FFFFFF");
+    setCtFooterBg(base.palette.footerBg || "#0A192F");
+    setCtFontFamily(base.typography.fontFamily);
+    setCtHeadingClass(base.typography.headingClass);
+    setCtButtonRadius(base.typography.buttonRadius);
+    setCtBadgeRadius(base.typography.badgeRadius);
+    setCtHeroHeadline(base.hero.headline);
+    setCtHeroHighlight(base.hero.headlineHighlight || "");
+    setCtHeroSubheadline(base.hero.subheadline);
+    setCtHeroBadge(base.hero.badge);
+    setCtHeroCtaPrimary(base.hero.ctaPrimary);
+    setCtHeroImageUrl(base.hero.imageUrl);
+    setCtAnnouncementText(base.announcementBar.text);
+    setCtAnnouncementBg(base.announcementBar.bg);
+    setCtAnnouncementTextColor(base.announcementBar.textColor);
+    setCtShowAnnouncement(true);
+    setCustomModalOpen(true);
+  };
+
+  const handleEditCustomTheme = (theme: AvroThemeDefinition) => {
+    setEditingThemeId(theme.id);
+    setCtName(theme.name);
+    setCtIndustry(theme.industry);
+    setCtTagline(theme.tagline);
+    setCtBasePreset(theme.code);
+    setCtPrimary(theme.palette.primary);
+    setCtAccent(theme.palette.accent);
+    setCtBackground(theme.palette.background);
+    setCtCardBg(theme.palette.cardBg);
+    setCtText(theme.palette.text);
+    setCtTextMuted(theme.palette.textMuted);
+    setCtBorder(theme.palette.border);
+    setCtHeaderBg(theme.palette.headerBg || "#FFFFFF");
+    setCtFooterBg(theme.palette.footerBg || "#0A192F");
+    setCtFontFamily(theme.typography.fontFamily);
+    setCtHeadingClass(theme.typography.headingClass);
+    setCtButtonRadius(theme.typography.buttonRadius);
+    setCtBadgeRadius(theme.typography.badgeRadius);
+    setCtHeroHeadline(theme.hero.headline);
+    setCtHeroHighlight(theme.hero.headlineHighlight || "");
+    setCtHeroSubheadline(theme.hero.subheadline);
+    setCtHeroBadge(theme.hero.badge);
+    setCtHeroCtaPrimary(theme.hero.ctaPrimary);
+    setCtHeroImageUrl(theme.hero.imageUrl);
+    setCtAnnouncementText(theme.announcementBar.text);
+    setCtAnnouncementBg(theme.announcementBar.bg);
+    setCtAnnouncementTextColor(theme.announcementBar.textColor);
+    setCtShowAnnouncement(true);
+    setCustomModalOpen(true);
+  };
+
+  const handleSaveCustomTheme = async (activateNow: boolean = false) => {
+    if (permissions?.plan === "BASIC") {
+      setCustomModalOpen(false);
+      setUpgradeModalOpen(true);
+      return;
+    }
+
+    if (!ctName.trim()) {
+      alert("Please enter a name for your custom theme.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const baseTheme = AVRO_THEMES.find((t) => t.code === ctBasePreset) || AVRO_THEMES[12];
+    const timestamp = Date.now();
+    const themeId = editingThemeId || `custom-${timestamp}`;
+    const themeCode = editingThemeId
+      ? (customThemes.find((t) => t.id === editingThemeId)?.code || `CUSTOM_${timestamp}`)
+      : `CUSTOM_${timestamp}`;
+
+    const newThemeDef: AvroThemeDefinition = {
+      id: themeId,
+      code: themeCode,
+      name: ctName.trim(),
+      industry: ctIndustry,
+      referenceUrl: "#",
+      referenceDisplay: "Custom Merchant Theme",
+      tagline: ctTagline.trim() || `Exclusive custom theme for ${ctName}`,
+      description: `Custom branded theme with bespoke ${ctIndustry.toLowerCase()} visual styling, typography, and layout rules.`,
+      isIncludedInFree: false,
+      palette: {
+        primary: ctPrimary,
+        accent: ctAccent,
+        background: ctBackground,
+        cardBg: ctCardBg,
+        text: ctText,
+        textMuted: ctTextMuted,
+        border: ctBorder,
+        badgeBg: ctPrimary,
+        badgeText: "#FFFFFF",
+        headerBg: ctHeaderBg,
+        footerBg: ctFooterBg,
+        accentGlow: "rgba(37,99,235,0.08)",
+      },
+      typography: {
+        fontFamily: ctFontFamily,
+        headingClass: ctHeadingClass,
+        bodyClass: "font-sans",
+        buttonRadius: ctButtonRadius,
+        badgeRadius: ctBadgeRadius,
+      },
+      hero: {
+        badge: ctHeroBadge || "EXCLUSIVE COLLECTION",
+        headline: ctHeroHeadline || ctName,
+        headlineHighlight: ctHeroHighlight || "",
+        subheadline: ctHeroSubheadline || "Discover handcrafted products and curated essentials.",
+        ctaPrimary: ctHeroCtaPrimary || "Shop Collection",
+        ctaSecondary: "Explore Catalog",
+        imageUrl: ctHeroImageUrl,
+        style: "editorial-split",
+      },
+      announcementBar: {
+        text: ctAnnouncementText,
+        bg: ctAnnouncementBg,
+        textColor: ctAnnouncementTextColor,
+      },
+      trustBadges: baseTheme.trustBadges || [
+        { title: "Express Dispatch", subtitle: "Shipped within 24 hours", icon: "truck" },
+        { title: "Safe & Encrypted Checkout", subtitle: "256-bit SSL encrypted payments", icon: "shield" },
+        { title: "Verified Authentic", subtitle: "100% Genuine manufacturer guarantee", icon: "award" },
+        { title: "7-Day Easy Replacement", subtitle: "Zero hassle doorstep resolution", icon: "refresh" },
+      ],
+      sampleCategories: baseTheme.sampleCategories || [],
+      sampleProducts: baseTheme.sampleProducts || [],
+    };
+
+    let updatedList: AvroThemeDefinition[];
+    if (editingThemeId) {
+      updatedList = customThemes.map((t) => (t.id === editingThemeId ? newThemeDef : t));
+    } else {
+      updatedList = [newThemeDef, ...customThemes];
+    }
+
+    setCustomThemes(updatedList);
+
+    // Prepare payload
+    let payloadConfig = { ...themeConfig };
+    let newOverrides = { ...customOverrides, customThemes: updatedList };
+
+    if (activateNow) {
+      newOverrides = {
+        ...newOverrides,
+        backgroundColor: newThemeDef.palette.background,
+        cardBg: newThemeDef.palette.cardBg,
+        textColor: newThemeDef.palette.text,
+        textMuted: newThemeDef.palette.textMuted,
+        buttonRadius: newThemeDef.typography.buttonRadius,
+        badgeRadius: newThemeDef.typography.badgeRadius,
+        heroBadge: newThemeDef.hero.badge,
+        headlineHighlight: newThemeDef.hero.headlineHighlight || "",
+        ctaPrimary: newThemeDef.hero.ctaPrimary,
+        ctaSecondary: newThemeDef.hero.ctaSecondary,
+        announcementBg: newThemeDef.announcementBar.bg,
+        announcementTextColor: newThemeDef.announcementBar.textColor,
+        trustBadges: newThemeDef.trustBadges,
+      };
+
+      payloadConfig = {
+        ...payloadConfig,
+        activeTheme: newThemeDef.code,
+        brandName: `${newThemeDef.name} Store`,
+        primaryColor: newThemeDef.palette.primary,
+        accentColor: newThemeDef.palette.accent,
+        fontFamily: newThemeDef.typography.fontFamily,
+        bannerHeadline: newThemeDef.hero.headline,
+        bannerSubheadline: newThemeDef.hero.subheadline,
+        bannerImageUrl: newThemeDef.hero.imageUrl,
+        announcementBarText: newThemeDef.announcementBar.text,
+        showAnnouncementBar: ctShowAnnouncement,
+      };
+
+      setThemeConfig(payloadConfig);
+      setCustomOverrides(newOverrides);
+    }
+
+    payloadConfig.socialLinksJson = JSON.stringify(newOverrides);
+    payloadConfig.customThemes = updatedList;
+
+    try {
+      const res = await fetch("/api/admin/themes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadConfig),
+      });
+
+      if (res.ok) {
+        setCustomModalOpen(false);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 4000);
+      } else if (res.status === 403) {
+        setCustomModalOpen(false);
+        setUpgradeModalOpen(true);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleActivateCustomTheme = async (theme: AvroThemeDefinition) => {
+    if (permissions?.plan === "BASIC") {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
+    setActivatingCode(theme.code);
+    const newOverrides = {
+      ...customOverrides,
+      backgroundColor: theme.palette.background,
+      cardBg: theme.palette.cardBg,
+      textColor: theme.palette.text,
+      textMuted: theme.palette.textMuted,
+      buttonRadius: theme.typography.buttonRadius,
+      badgeRadius: theme.typography.badgeRadius,
+      heroBadge: theme.hero.badge,
+      headlineHighlight: theme.hero.headlineHighlight || "",
+      ctaPrimary: theme.hero.ctaPrimary,
+      ctaSecondary: theme.hero.ctaSecondary,
+      announcementBg: theme.announcementBar.bg,
+      announcementTextColor: theme.announcementBar.textColor,
+      trustBadges: theme.trustBadges,
+      customThemes,
+    };
+
+    const newConfig = {
+      ...themeConfig,
+      activeTheme: theme.code,
+      brandName: `${theme.name} Store`,
+      primaryColor: theme.palette.primary,
+      accentColor: theme.palette.accent,
+      fontFamily: theme.typography.fontFamily,
+      bannerHeadline: theme.hero.headline,
+      bannerSubheadline: theme.hero.subheadline,
+      bannerImageUrl: theme.hero.imageUrl,
+      announcementBarText: theme.announcementBar.text,
+      showAnnouncementBar: true,
+      socialLinksJson: JSON.stringify(newOverrides),
+      customThemes,
+    };
+
+    setThemeConfig(newConfig);
+    setCustomOverrides(newOverrides);
+
+    try {
+      const res = await fetch("/api/admin/themes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newConfig),
+      });
+
+      if (res.ok) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3500);
+      }
+    } finally {
+      setActivatingCode(null);
+    }
+  };
+
+  const handleDuplicateCustomTheme = async (theme: AvroThemeDefinition) => {
+    if (permissions?.plan === "BASIC") {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
+    const timestamp = Date.now();
+    const clonedTheme: AvroThemeDefinition = {
+      ...theme,
+      id: `custom-${timestamp}`,
+      code: `CUSTOM_${timestamp}`,
+      name: `${theme.name} (Copy)`,
+    };
+
+    const updated = [clonedTheme, ...customThemes];
+    setCustomThemes(updated);
+
+    const newOverrides = { ...customOverrides, customThemes: updated };
+    await fetch("/api/admin/themes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...themeConfig,
+        customThemes: updated,
+        socialLinksJson: JSON.stringify(newOverrides),
+      }),
+    });
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
+  const handleDeleteCustomTheme = async (themeId: string) => {
+    const target = customThemes.find((t) => t.id === themeId);
+    if (!target) return;
+    if (!confirm(`Are you sure you want to delete the custom theme "${target.name}"?`)) return;
+
+    const updated = customThemes.filter((t) => t.id !== themeId);
+    setCustomThemes(updated);
+
+    const isCurrentActive =
+      themeConfig?.activeTheme === target.code || themeConfig?.activeTheme === target.id;
+
+    const newOverrides = { ...customOverrides, customThemes: updated };
+    const payload: any = {
+      ...themeConfig,
+      customThemes: updated,
+      socialLinksJson: JSON.stringify(newOverrides),
+    };
+
+    if (isCurrentActive) {
+      payload.activeTheme = "AVRO_SIGNATURE";
+      setThemeConfig((prev: any) => ({ ...prev, activeTheme: "AVRO_SIGNATURE" }));
+    }
+
+    await fetch("/api/admin/themes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
   const filteredThemes =
     selectedFilter === "ALL"
       ? AVRO_THEMES
@@ -240,8 +639,9 @@ export default function ThemesAdminPage() {
     return <div className="text-xs text-slate-500 py-16 text-center">Loading AVRO Visual Theme Engine...</div>;
   }
 
+  const allThemesList = [...customThemes, ...AVRO_THEMES];
   const activeThemeObj =
-    AVRO_THEMES.find(
+    allThemesList.find(
       (t) =>
         t.code === themeConfig?.activeTheme ||
         t.id === themeConfig?.activeTheme ||
@@ -288,6 +688,26 @@ export default function ThemesAdminPage() {
               Visual Theme Editor
             </button>
             <button
+              onClick={() => {
+                if (permissions?.plan === "BASIC") {
+                  setUpgradeModalOpen(true);
+                } else {
+                  setActiveTab("CUSTOM");
+                }
+              }}
+              className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                activeTab === "CUSTOM"
+                  ? "bg-white text-slate-900 shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Custom Themes</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-700">
+                {customThemes.length}
+              </span>
+            </button>
+            <button
               onClick={() => setActiveTab("LIBRARY")}
               className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                 activeTab === "LIBRARY"
@@ -299,6 +719,15 @@ export default function ThemesAdminPage() {
               13 Preset Archetypes
             </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => handleOpenCreateNewTheme()}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5 text-white" />
+            <span>Create Custom Theme</span>
+          </button>
 
           <a
             href="/"
@@ -1218,7 +1647,235 @@ export default function ThemesAdminPage() {
         </div>
       )}
 
-      {/* TAB 2: PRESET THEME ARCHETYPES LIBRARY */}
+      {/* TAB 2: CUSTOM THEMES GALLERY (GROW & PLUS) */}
+      {activeTab === "CUSTOM" && (
+        <div className="space-y-6">
+          {/* Header Banner */}
+          <div className="bg-gradient-to-r from-[#0A192F] via-[#112240] to-[#1E293B] rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  Bespoke Theme Studio
+                </span>
+                <span className="text-xs text-slate-400">· Grow & Plus Unlocked</span>
+              </div>
+              <h2 className="text-xl font-black text-white tracking-tight">Custom Branded Themes</h2>
+              <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                Design, save, and activate custom storefront themes with your own tailored colors, fonts, shapes, and hero banners. Add as many themes as you want for seasonal drops, flash sales, or bespoke branding.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleOpenCreateNewTheme()}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-md cursor-pointer shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Custom Theme</span>
+            </button>
+          </div>
+
+          {/* Grid of Saved Custom Themes */}
+          {customThemes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {customThemes.map((th) => {
+                const isActive =
+                  themeConfig?.activeTheme === th.code ||
+                  themeConfig?.activeTheme === th.id;
+                const isActivating = activatingCode === th.code;
+
+                return (
+                  <div
+                    key={th.id}
+                    className={`rounded-2xl bg-white border overflow-hidden shadow-xs transition-all relative flex flex-col justify-between ${
+                      isActive
+                        ? "border-[#2563EB] ring-2 ring-[#2563EB]/20 shadow-md"
+                        : "border-slate-200 hover:border-slate-300 hover:shadow-md"
+                    }`}
+                  >
+                    <div>
+                      {/* Thumbnail Header */}
+                      <div className="h-44 bg-slate-100 overflow-hidden relative group">
+                        <img
+                          src={th.hero.imageUrl || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=85"}
+                          alt={th.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white backdrop-blur-sm shadow-xs flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-amber-300" />
+                            Custom Theme
+                          </span>
+                          {isActive ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500 text-white flex items-center gap-1 shadow-sm">
+                              <Check className="w-3 h-3" /> ACTIVE
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-black/60 text-slate-300">
+                              {th.industry}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="absolute bottom-3 left-4 right-4 text-white">
+                          <h4 className="font-extrabold text-base tracking-tight">{th.name}</h4>
+                          <p className="text-[11px] text-slate-200 truncate">{th.tagline || th.hero.headline}</p>
+                        </div>
+                      </div>
+
+                      {/* Details & Palette */}
+                      <div className="p-4 space-y-3">
+                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                          {th.description}
+                        </p>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                          <span className="text-slate-500 font-semibold">Custom Palette:</span>
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className="w-4 h-4 rounded-full border border-black/10 shadow-2xs"
+                              style={{ backgroundColor: th.palette.primary }}
+                              title={`Primary: ${th.palette.primary}`}
+                            />
+                            <span
+                              className="w-4 h-4 rounded-full border border-black/10 shadow-2xs"
+                              style={{ backgroundColor: th.palette.accent }}
+                              title={`Accent: ${th.palette.accent}`}
+                            />
+                            <span
+                              className="w-4 h-4 rounded-full border border-black/10 shadow-2xs"
+                              style={{ backgroundColor: th.palette.background }}
+                              title={`Backdrop: ${th.palette.background}`}
+                            />
+                            <span
+                              className="w-4 h-4 rounded-full border border-black/10 shadow-2xs"
+                              style={{ backgroundColor: th.palette.cardBg }}
+                              title={`Surface: ${th.palette.cardBg}`}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[11px] text-slate-500">
+                          <span>Typography:</span>
+                          <span className="font-mono text-slate-700 font-bold truncate max-w-[140px]">
+                            {th.typography.fontFamily.split(",")[0]}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Actions */}
+                    <div className="p-4 pt-0 space-y-2">
+                      <div className="flex items-center gap-2">
+                        {isActive ? (
+                          <div className="flex-1 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold text-center border border-emerald-200 flex items-center justify-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            Active on Storefront
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isActivating}
+                            onClick={() => handleActivateCustomTheme(th)}
+                            className="flex-1 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                          >
+                            {isActivating ? (
+                              <span>Activating...</span>
+                            ) : (
+                              <>
+                                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                                Activate Theme
+                              </>
+                            )}
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => handleEditCustomTheme(th)}
+                          className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition cursor-pointer"
+                          title="Edit Theme Details"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDuplicateCustomTheme(th)}
+                          className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition cursor-pointer"
+                          title="Duplicate Theme"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCustomTheme(th.id)}
+                          className="p-2 rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-600 transition cursor-pointer"
+                          title="Delete Theme"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Add Another Theme Card */}
+              <div
+                onClick={() => handleOpenCreateNewTheme()}
+                className="rounded-2xl border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/20 transition-all p-8 flex flex-col items-center justify-center text-center cursor-pointer min-h-[300px] group"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center shadow-xs mb-3">
+                  <Plus className="w-6 h-6" />
+                </div>
+                <h4 className="font-extrabold text-sm text-slate-800 group-hover:text-blue-600 transition-colors">
+                  Add Another Custom Theme
+                </h4>
+                <p className="text-xs text-slate-400 max-w-xs mt-1">
+                  Build and save another custom theme with unique branding, colors, and layout rules.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center max-w-2xl mx-auto shadow-xs space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-blue-50 text-[#2563EB] mx-auto flex items-center justify-center shadow-xs">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-black text-slate-900">No Custom Themes Created Yet</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                  With your <strong>Grow Plan</strong>, you have access to the AVRO Bespoke Theme Studio. Create custom themes from scratch or clone any of the 13 presets to customize and save your own theme collection.
+                </p>
+              </div>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleOpenCreateNewTheme()}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create Your First Custom Theme</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("LIBRARY")}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Layers className="w-4 h-4" />
+                  <span>Browse 13 Presets to Fork</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: PRESET THEME ARCHETYPES LIBRARY */}
       {activeTab === "LIBRARY" && (
         <div className="space-y-6">
           {/* Basic Plan Theme Limitation Alert */}
@@ -1253,7 +1910,7 @@ export default function ThemesAdminPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-500/30 text-blue-300 border border-blue-400/30">
-                    CURRENT PRESET
+                    CURRENT THEME
                   </span>
                   <span className="text-xs text-slate-400">{activeThemeObj.industry}</span>
                 </div>
@@ -1262,13 +1919,25 @@ export default function ThemesAdminPage() {
               </div>
             </div>
 
-            <button
-              onClick={() => setActiveTab("EDITOR")}
-              className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow"
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              Customize in Visual Editor
-            </button>
+            <div className="flex items-center gap-2">
+              {permissions?.plan !== "BASIC" && (
+                <button
+                  type="button"
+                  onClick={() => handleOpenCreateNewTheme(activeThemeObj.code)}
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5 border border-white/20 shadow-xs cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Fork Active Theme</span>
+                </button>
+              )}
+              <button
+                onClick={() => setActiveTab("EDITOR")}
+                className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow cursor-pointer"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                Customize in Visual Editor
+              </button>
+            </div>
           </div>
 
           {/* Category Filter Pills */}
@@ -1388,26 +2057,687 @@ export default function ThemesAdminPage() {
                         Unlock with Grow / Plus
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={isActivating}
-                        onClick={() => handleApplyPreset(th)}
-                        className="w-full py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                      >
-                        {isActivating ? (
-                          <span>Activating...</span>
-                        ) : (
-                          <>
-                            <Zap className="w-3.5 h-3.5 text-amber-400" />
-                            Apply Preset
-                          </>
+                      <div className="flex items-center gap-2 w-full">
+                        <button
+                          type="button"
+                          disabled={isActivating}
+                          onClick={() => handleApplyPreset(th)}
+                          className="flex-1 py-2 rounded-xl bg-[#0A192F] hover:bg-[#1E293B] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                        >
+                          {isActivating ? (
+                            <span>Activating...</span>
+                          ) : (
+                            <>
+                              <Zap className="w-3.5 h-3.5 text-amber-400" />
+                              Apply Preset
+                            </>
+                          )}
+                        </button>
+                        {permissions?.plan !== "BASIC" && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenCreateNewTheme(th.code)}
+                            className="py-2 px-3 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer shrink-0"
+                            title="Fork into a new custom theme"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                            <span>Fork</span>
+                          </button>
                         )}
-                      </button>
+                      </div>
                     )}
                   </div>
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CUSTOM THEME BUILDER & DESIGNER */}
+      {customModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-4xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
+                    {editingThemeId ? "Edit Custom Theme" : "Create Custom Branded Theme"}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Configure tailored palettes, typography, button radii, and hero branding for your store.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCustomModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Scrollable Body (Split Form & Live Preview) */}
+            <div className="p-6 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Form Controls (7 cols) */}
+              <div className="lg:col-span-7 space-y-6 text-xs">
+                {/* 1. Identity & Base Clone */}
+                <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3.5">
+                  <span className="font-extrabold text-slate-800 text-xs block">1. Theme Identity & Quick-Start</span>
+                  
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Theme Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={ctName}
+                      onChange={(e) => setCtName(e.target.value)}
+                      placeholder="Theme brand name"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-bold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Industry Archetype</label>
+                      <select
+                        value={ctIndustry}
+                        onChange={(e) => setCtIndustry(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      >
+                        {categories.filter((c) => c.key !== "ALL").map((c) => (
+                          <option key={c.key} value={c.key}>{c.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Clone Base Preset (Optional)</label>
+                      <select
+                        value={ctBasePreset}
+                        onChange={(e) => {
+                          const chosenCode = e.target.value;
+                          setCtBasePreset(chosenCode);
+                          const base = AVRO_THEMES.find((t) => t.code === chosenCode);
+                          if (base) {
+                            setCtPrimary(base.palette.primary);
+                            setCtAccent(base.palette.accent);
+                            setCtBackground(base.palette.background);
+                            setCtCardBg(base.palette.cardBg);
+                            setCtText(base.palette.text);
+                            setCtTextMuted(base.palette.textMuted);
+                            setCtBorder(base.palette.border);
+                            setCtHeaderBg(base.palette.headerBg || "#FFFFFF");
+                            setCtFooterBg(base.palette.footerBg || "#0A192F");
+                            setCtFontFamily(base.typography.fontFamily);
+                            setCtHeadingClass(base.typography.headingClass);
+                            setCtButtonRadius(base.typography.buttonRadius);
+                            setCtBadgeRadius(base.typography.badgeRadius);
+                            setCtHeroHeadline(base.hero.headline);
+                            setCtHeroHighlight(base.hero.headlineHighlight || "");
+                            setCtHeroSubheadline(base.hero.subheadline);
+                            setCtHeroBadge(base.hero.badge);
+                            setCtHeroCtaPrimary(base.hero.ctaPrimary);
+                            setCtHeroImageUrl(base.hero.imageUrl);
+                            setCtAnnouncementText(base.announcementBar.text);
+                            setCtAnnouncementBg(base.announcementBar.bg);
+                            setCtAnnouncementTextColor(base.announcementBar.textColor);
+                          }
+                        }}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      >
+                        {AVRO_THEMES.map((th) => (
+                          <option key={th.code} value={th.code}>{th.name} ({th.industry})</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Theme Tagline</label>
+                    <input
+                      type="text"
+                      value={ctTagline}
+                      onChange={(e) => setCtTagline(e.target.value)}
+                      placeholder="Theme tagline / brief description"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-slate-800 bg-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Color Palette */}
+                <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3.5">
+                  <span className="font-extrabold text-slate-800 text-xs block">2. Custom Brand Palette</span>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">Primary Brand</label>
+                      <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                        <input
+                          type="color"
+                          value={ctPrimary}
+                          onChange={(e) => setCtPrimary(e.target.value)}
+                          className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={ctPrimary}
+                          onChange={(e) => setCtPrimary(e.target.value)}
+                          className="w-full text-[11px] font-mono outline-none uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">Accent / Action</label>
+                      <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                        <input
+                          type="color"
+                          value={ctAccent}
+                          onChange={(e) => setCtAccent(e.target.value)}
+                          className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={ctAccent}
+                          onChange={(e) => setCtAccent(e.target.value)}
+                          className="w-full text-[11px] font-mono outline-none uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">Store Backdrop</label>
+                      <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                        <input
+                          type="color"
+                          value={ctBackground}
+                          onChange={(e) => setCtBackground(e.target.value)}
+                          className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={ctBackground}
+                          onChange={(e) => setCtBackground(e.target.value)}
+                          className="w-full text-[11px] font-mono outline-none uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">Card / Surface</label>
+                      <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                        <input
+                          type="color"
+                          value={ctCardBg}
+                          onChange={(e) => setCtCardBg(e.target.value)}
+                          className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={ctCardBg}
+                          onChange={(e) => setCtCardBg(e.target.value)}
+                          className="w-full text-[11px] font-mono outline-none uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">Text Color</label>
+                      <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                        <input
+                          type="color"
+                          value={ctText}
+                          onChange={(e) => setCtText(e.target.value)}
+                          className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={ctText}
+                          onChange={(e) => setCtText(e.target.value)}
+                          className="w-full text-[11px] font-mono outline-none uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">Header Bar</label>
+                      <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                        <input
+                          type="color"
+                          value={ctHeaderBg}
+                          onChange={(e) => setCtHeaderBg(e.target.value)}
+                          className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent"
+                        />
+                        <input
+                          type="text"
+                          value={ctHeaderBg}
+                          onChange={(e) => setCtHeaderBg(e.target.value)}
+                          className="w-full text-[11px] font-mono outline-none uppercase"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Typography & UI Geometry */}
+                <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3.5">
+                  <span className="font-extrabold text-slate-800 text-xs block">3. Typography & Corner Radii</span>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Primary Font Family</label>
+                      <select
+                        value={ctFontFamily}
+                        onChange={(e) => setCtFontFamily(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-medium focus:outline-none"
+                      >
+                        {fontOptions.map((f) => (
+                          <option key={f.value} value={f.value}>{f.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Button Corner Radius</label>
+                      <div className="grid grid-cols-3 gap-1.5 pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setCtButtonRadius("rounded-none")}
+                          className={`py-1.5 px-2 text-center text-[10px] font-bold border transition ${
+                            ctButtonRadius === "rounded-none"
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white text-slate-700 border-slate-300"
+                          }`}
+                        >
+                          Sharp (0px)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCtButtonRadius("rounded-xl")}
+                          className={`py-1.5 px-2 rounded-xl text-center text-[10px] font-bold border transition ${
+                            ctButtonRadius === "rounded-xl"
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white text-slate-700 border-slate-300"
+                          }`}
+                        >
+                          Smooth
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCtButtonRadius("rounded-full")}
+                          className={`py-1.5 px-2 rounded-full text-center text-[10px] font-bold border transition ${
+                            ctButtonRadius === "rounded-full"
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white text-slate-700 border-slate-300"
+                          }`}
+                        >
+                          Pill
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Hero Banner Defaults */}
+                <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3.5">
+                  <span className="font-extrabold text-slate-800 text-xs block">4. Homepage Hero Banner & Copy</span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Hero Micro-Badge</label>
+                      <input
+                        type="text"
+                        value={ctHeroBadge}
+                        onChange={(e) => setCtHeroBadge(e.target.value)}
+                        placeholder="Micro-badge text"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Primary CTA Button</label>
+                      <input
+                        type="text"
+                        value={ctHeroCtaPrimary}
+                        onChange={(e) => setCtHeroCtaPrimary(e.target.value)}
+                        placeholder="Button label"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Main Headline</label>
+                      <input
+                        type="text"
+                        value={ctHeroHeadline}
+                        onChange={(e) => setCtHeroHeadline(e.target.value)}
+                        placeholder="Hero main headline"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Accent Word (Italic)</label>
+                      <input
+                        type="text"
+                        value={ctHeroHighlight}
+                        onChange={(e) => setCtHeroHighlight(e.target.value)}
+                        placeholder="Accent word / phrase"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Hero Image URL</label>
+                    <input
+                      type="text"
+                      value={ctHeroImageUrl}
+                      onChange={(e) => setCtHeroImageUrl(e.target.value)}
+                      placeholder="Image URL"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-[11px]"
+                    />
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {heroImagePresets.map((img) => (
+                        <button
+                          key={img.label}
+                          type="button"
+                          onClick={() => setCtHeroImageUrl(img.url)}
+                          className="px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-[10px] text-slate-600"
+                        >
+                          {img.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. Announcement Bar */}
+                <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-slate-800 text-xs">5. Top Announcement Bar</span>
+                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={ctShowAnnouncement}
+                        onChange={(e) => setCtShowAnnouncement(e.target.checked)}
+                        className="rounded"
+                      />
+                      <span>Enable Bar</span>
+                    </label>
+                  </div>
+
+                  {ctShowAnnouncement && (
+                    <div className="space-y-3">
+                      <div>
+                        <input
+                          type="text"
+                          value={ctAnnouncementText}
+                          onChange={(e) => setCtAnnouncementText(e.target.value)}
+                          placeholder="Announcement bar message"
+                          className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-slate-600 mb-1 text-[11px]">Bar Background</label>
+                          <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                            <input
+                              type="color"
+                              value={ctAnnouncementBg}
+                              onChange={(e) => setCtAnnouncementBg(e.target.value)}
+                              className="w-5 h-5 rounded border-none cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={ctAnnouncementBg}
+                              onChange={(e) => setCtAnnouncementBg(e.target.value)}
+                              className="w-full text-[11px] font-mono outline-none uppercase"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-slate-600 mb-1 text-[11px]">Bar Text Color</label>
+                          <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg p-1 bg-white">
+                            <input
+                              type="color"
+                              value={ctAnnouncementTextColor}
+                              onChange={(e) => setCtAnnouncementTextColor(e.target.value)}
+                              className="w-5 h-5 rounded border-none cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={ctAnnouncementTextColor}
+                              onChange={(e) => setCtAnnouncementTextColor(e.target.value)}
+                              className="w-full text-[11px] font-mono outline-none uppercase"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Live Mockup Preview (5 cols) */}
+              <div className="lg:col-span-5 sticky top-0 space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <span className="font-extrabold text-xs text-slate-800 flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-blue-600" />
+                    Real-Time Storefront Mockup
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700">
+                    Live Preview
+                  </span>
+                </div>
+
+                {/* Simulated Storefront Card */}
+                <div
+                  className="rounded-2xl border border-slate-200 overflow-hidden shadow-lg transition-all"
+                  style={{
+                    backgroundColor: ctBackground,
+                    fontFamily: ctFontFamily,
+                  }}
+                >
+                  {/* Mockup Announcement */}
+                  {ctShowAnnouncement && (
+                    <div
+                      className="px-3 py-1.5 text-[9px] text-center font-bold truncate transition-colors"
+                      style={{
+                        backgroundColor: ctAnnouncementBg,
+                        color: ctAnnouncementTextColor,
+                      }}
+                    >
+                      {ctAnnouncementText}
+                    </div>
+                  )}
+
+                  {/* Mockup Header */}
+                  <div
+                    className="px-3.5 py-2.5 border-b flex items-center justify-between transition-colors"
+                    style={{
+                      backgroundColor: ctHeaderBg,
+                      borderColor: ctBorder,
+                    }}
+                  >
+                    <span className="font-extrabold text-xs" style={{ color: ctText }}>
+                      {ctName.trim() || "Brand Store"}
+                    </span>
+                    <div className="flex items-center gap-2 text-[10px]" style={{ color: ctTextMuted }}>
+                      <span>Shop</span>
+                      <span>Deals</span>
+                      <ShoppingBag className="w-3.5 h-3.5" style={{ color: ctText }} />
+                    </div>
+                  </div>
+
+                  {/* Mockup Hero */}
+                  <div className="p-4 space-y-2.5 relative overflow-hidden">
+                    <span
+                      className="inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded-full shadow-2xs"
+                      style={{
+                        backgroundColor: ctPrimary,
+                        color: "#FFFFFF",
+                      }}
+                    >
+                      {ctHeroBadge || "EXCLUSIVE COLLECTION"}
+                    </span>
+
+                    <h4
+                      className="text-base font-black leading-tight tracking-tight line-clamp-2"
+                      style={{ color: ctText }}
+                    >
+                      {ctHeroHeadline.trim() || ctName.trim() || "Your Store Headline"}{" "}
+                      {ctHeroHighlight && (
+                        <span className="italic" style={{ color: ctAccent }}>
+                          {ctHeroHighlight}
+                        </span>
+                      )}
+                    </h4>
+
+                    <p className="text-[10px] line-clamp-2 leading-relaxed" style={{ color: ctTextMuted }}>
+                      {ctHeroSubheadline || "Discover handcrafted products and curated essentials."}
+                    </p>
+
+                    <div className="pt-1 flex items-center gap-2">
+                      <button
+                        type="button"
+                        className={`px-3 py-1.5 text-[10px] font-bold text-white shadow-xs ${ctButtonRadius}`}
+                        style={{ backgroundColor: ctPrimary }}
+                      >
+                        {ctHeroCtaPrimary || "Shop Collection"}
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-3 py-1.5 text-[10px] font-bold border ${ctButtonRadius}`}
+                        style={{
+                          borderColor: ctBorder,
+                          color: ctText,
+                          backgroundColor: ctCardBg,
+                        }}
+                      >
+                        Explore
+                      </button>
+                    </div>
+
+                    {/* Hero Thumbnail */}
+                    <div className="h-28 rounded-xl overflow-hidden mt-2 relative border" style={{ borderColor: ctBorder }}>
+                      <img
+                        src={ctHeroImageUrl}
+                        alt="Hero preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mockup Product Card Surface */}
+                  <div className="p-3 border-t" style={{ borderColor: ctBorder }}>
+                    <div
+                      className="p-3 rounded-xl border space-y-2 shadow-2xs"
+                      style={{
+                        backgroundColor: ctCardBg,
+                        borderColor: ctBorder,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-extrabold" style={{ color: ctText }}>
+                          Featured Product
+                        </span>
+                        <span className="text-[10px] font-bold" style={{ color: ctAccent }}>
+                          ₹1,499
+                        </span>
+                      </div>
+                      <div className="h-16 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center text-[10px] text-slate-400">
+                        Product Visual
+                      </div>
+                      <button
+                        type="button"
+                        className={`w-full py-1 text-[9px] font-bold text-white shadow-2xs ${ctButtonRadius}`}
+                        style={{ backgroundColor: ctPrimary }}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Mockup Footer */}
+                  <div
+                    className="p-3 text-[9px] text-center border-t text-white/80"
+                    style={{ backgroundColor: ctFooterBg }}
+                  >
+                    <span>© {new Date().getFullYear()} {ctName.trim() || "Brand Store"}. Powered by AVRO.</span>
+                  </div>
+                </div>
+
+                {/* Swatches strip */}
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-500 block">Active Theme Palette:</span>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 text-center">
+                      <div className="h-6 rounded-lg border border-black/10" style={{ backgroundColor: ctPrimary }} />
+                      <span className="text-[9px] text-slate-400 mt-0.5 block font-mono">Primary</span>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="h-6 rounded-lg border border-black/10" style={{ backgroundColor: ctAccent }} />
+                      <span className="text-[9px] text-slate-400 mt-0.5 block font-mono">Accent</span>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="h-6 rounded-lg border border-black/10" style={{ backgroundColor: ctBackground }} />
+                      <span className="text-[9px] text-slate-400 mt-0.5 block font-mono">Backdrop</span>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="h-6 rounded-lg border border-black/10" style={{ backgroundColor: ctCardBg }} />
+                      <span className="text-[9px] text-slate-400 mt-0.5 block font-mono">Surface</span>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <div className="h-6 rounded-lg border border-black/10" style={{ backgroundColor: ctText }} />
+                      <span className="text-[9px] text-slate-400 mt-0.5 block font-mono">Text</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setCustomModalOpen(false)}
+                className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-2.5">
+                <button
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => handleSaveCustomTheme(false)}
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 font-bold text-xs transition shadow-2xs cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Save className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Save to Custom Library</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => handleSaveCustomTheme(true)}
+                  className="w-full sm:w-auto px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs transition shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Zap className="w-3.5 h-3.5 text-amber-300" />
+                  <span>{isSaving ? "Saving..." : "Save & Activate on Storefront"}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

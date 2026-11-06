@@ -14,7 +14,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { AVRO_THEMES } from "@/lib/themes-registry";
+import { AVRO_THEMES, resolveStoreTheme } from "@/lib/themes-registry";
 
 function renderTrustIcon(icon: string) {
   switch (icon) {
@@ -37,14 +37,7 @@ function renderTrustIcon(icon: string) {
 export default function StoreFooter({ theme }: { theme?: any }) {
   const searchParams = useSearchParams();
   const previewParam = searchParams?.get("theme") || searchParams?.get("previewTheme");
-  const matchingThemeDef = AVRO_THEMES.find(
-    (t) =>
-      t.id === previewParam ||
-      t.code === previewParam ||
-      t.code === theme?.activeTheme ||
-      t.id === theme?.activeTheme ||
-      (theme?.activeTheme === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
-  ) || AVRO_THEMES[12];
+  const matchingThemeDef = resolveStoreTheme(previewParam || theme?.activeTheme, theme);
 
   const brandName = theme?.brandName || `${matchingThemeDef.name} Store`;
   const currentYear = new Date().getFullYear();

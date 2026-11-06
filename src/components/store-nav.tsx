@@ -18,7 +18,7 @@ import {
 import { useCart } from "@/context/cart-context";
 import { useWishlist } from "@/context/wishlist-context";
 import { useState, useEffect, useRef } from "react";
-import { AVRO_THEMES } from "@/lib/themes-registry";
+import { AVRO_THEMES, resolveStoreTheme } from "@/lib/themes-registry";
 
 interface CustomerUser {
   id: string;
@@ -42,15 +42,7 @@ export function StoreNav({ theme }: { theme?: any }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const previewParam = searchParams?.get("theme") || searchParams?.get("previewTheme");
-  const matchingThemeDef =
-    AVRO_THEMES.find(
-      (t) =>
-        t.id === previewParam ||
-        t.code === previewParam ||
-        t.code === theme?.activeTheme ||
-        t.id === theme?.activeTheme ||
-        (theme?.activeTheme === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
-    ) || AVRO_THEMES[12];
+  const matchingThemeDef = resolveStoreTheme(previewParam || theme?.activeTheme, theme);
 
   const brandName = theme?.brandName || `${matchingThemeDef.name} Store`;
   const announcementText = theme?.announcementBarText || matchingThemeDef.announcementBar.text;

@@ -15,7 +15,7 @@ import {
   Flame,
   TrendingUp,
 } from "lucide-react";
-import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
+import { AVRO_THEMES, AvroThemeDefinition, resolveStoreTheme } from "@/lib/themes-registry";
 import { ProductCard } from "@/components/product-card";
 import { getCachedStoreTheme } from "@/lib/theme-cache";
 import { getStorePermissions } from "@/lib/permissions";
@@ -59,17 +59,9 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
     // Database unseeded or unreachable
   }
 
-  // Find theme definition matching query param OR db setting
+  // Find theme definition matching query param OR db setting (supports both presets and custom merchant themes)
   const activeCode = themeParam || dbTheme?.activeTheme || "AVRO_SIGNATURE";
-  const themeDef: AvroThemeDefinition =
-    AVRO_THEMES.find(
-      (t) =>
-        t.code === activeCode ||
-        t.id === activeCode ||
-        t.id.toLowerCase() === activeCode.toLowerCase() ||
-        t.code.toLowerCase() === activeCode.toLowerCase() ||
-        (activeCode.toUpperCase() === "TALIM_DEFAULT" && t.code === "AVRO_SIGNATURE")
-    ) || AVRO_THEMES[12]; // Fallback to AVRO Signature
+  const themeDef: AvroThemeDefinition = resolveStoreTheme(activeCode, dbTheme);
 
   // Check if DB customizer has overrides
   let customOverrides: any = {};
