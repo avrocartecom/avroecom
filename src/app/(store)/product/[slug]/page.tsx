@@ -9,14 +9,19 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      variants: true,
-      category: true,
-    },
-  });
+  let product = null;
+  try {
+    product = await prisma.product.findUnique({
+      where: { slug: params.slug },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        variants: true,
+        category: true,
+      },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   if (!product) {
     notFound();

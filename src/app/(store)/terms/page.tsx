@@ -3,9 +3,14 @@ export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 
 export default async function TermsPage() {
-  const customPage = await prisma.customPage.findUnique({
-    where: { slug: "terms" },
-  });
+  let customPage = null;
+  try {
+    customPage = await prisma.customPage.findUnique({
+      where: { slug: "terms" },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   const title = customPage?.title || "Terms of Service & Usage";
   const rawContent = customPage?.content || `### 1. Acceptance of Terms

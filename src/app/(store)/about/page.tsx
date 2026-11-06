@@ -5,10 +5,18 @@ import { ShieldCheck, Truck, Award, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default async function AboutPage() {
-  const [theme, customAboutPage] = await Promise.all([
-    prisma.storeThemeSetting.findFirst(),
-    prisma.customPage.findUnique({ where: { slug: "about" } }),
-  ]);
+  let theme: any = null;
+  let customAboutPage: any = null;
+  try {
+    const [t, p] = await Promise.all([
+      prisma.storeThemeSetting.findFirst(),
+      prisma.customPage.findUnique({ where: { slug: "about" } }),
+    ]);
+    theme = t;
+    customAboutPage = p;
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   const brandName = theme?.brandName || "AVRO Store";
   const pageTitle = customAboutPage?.title || `About ${brandName}`;

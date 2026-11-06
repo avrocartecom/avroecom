@@ -3,9 +3,14 @@ export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 
 export default async function ReturnPolicyPage() {
-  const customPage = await prisma.customPage.findUnique({
-    where: { slug: "return-policy" },
-  });
+  let customPage = null;
+  try {
+    customPage = await prisma.customPage.findUnique({
+      where: { slug: "return-policy" },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   const title = customPage?.title || "Return & Replacement Policy";
   const rawContent = customPage?.content || `### 7-Day Hassle-Free Returns & Exchange

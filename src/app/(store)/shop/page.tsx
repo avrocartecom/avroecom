@@ -12,9 +12,14 @@ export default async function ShopCatalogPage({
 }) {
   const { category, search, sort } = searchParams;
 
-  const categories = await prisma.category.findMany({
-    orderBy: { sortOrder: "asc" },
-  });
+  let categories: any[] = [];
+  try {
+    categories = await prisma.category.findMany({
+      orderBy: { sortOrder: "asc" },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   // Build query
   const where: any = { status: "PUBLISHED" };
@@ -33,15 +38,20 @@ export default async function ShopCatalogPage({
   if (sort === "price-asc") orderBy = { regularPrice: "asc" };
   else if (sort === "price-desc") orderBy = { regularPrice: "desc" };
 
-  const products = await prisma.product.findMany({
-    where,
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      variants: true,
-      category: true,
-    },
-    orderBy,
-  });
+  let products: any[] = [];
+  try {
+    products = await prisma.product.findMany({
+      where,
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        variants: true,
+        category: true,
+      },
+      orderBy,
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">

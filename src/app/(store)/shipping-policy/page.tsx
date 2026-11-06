@@ -3,9 +3,14 @@ export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 
 export default async function ShippingPolicyPage() {
-  const customPage = await prisma.customPage.findUnique({
-    where: { slug: "shipping-policy" },
-  });
+  let customPage = null;
+  try {
+    customPage = await prisma.customPage.findUnique({
+      where: { slug: "shipping-policy" },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   const title = customPage?.title || "Shipping & Delivery Policy";
   const rawContent = customPage?.content || `### Order Processing & Dispatch

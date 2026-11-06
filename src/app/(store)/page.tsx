@@ -50,7 +50,12 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
       : undefined
   );
 
-  const dbTheme = await prisma.storeThemeSetting.findFirst();
+  let dbTheme: any = null;
+  try {
+    dbTheme = await prisma.storeThemeSetting.findFirst();
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   // Find theme definition matching query param OR db setting
   const activeCode = themeParam || dbTheme?.activeTheme || "AVRO_SIGNATURE";
@@ -91,16 +96,21 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
   const subheadline = dbTheme?.bannerSubheadline && !themeParam ? dbTheme.bannerSubheadline : themeDef.hero.subheadline;
   const heroImage = dbTheme?.bannerImageUrl && !themeParam ? dbTheme.bannerImageUrl : themeDef.hero.imageUrl;
 
-  const dbProducts = await prisma.product.findMany({
-    where: { status: "PUBLISHED" },
-    include: {
-      images: { orderBy: { sortOrder: "asc" } },
-      variants: true,
-      category: true,
-    },
-    take: 4,
-    orderBy: { createdAt: "desc" },
-  });
+  let dbProducts: any[] = [];
+  try {
+    dbProducts = await prisma.product.findMany({
+      where: { status: "PUBLISHED" },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        variants: true,
+        category: true,
+      },
+      take: 4,
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   const isDarkHero =
     themeDef.hero.style === "tech-contrast" ||

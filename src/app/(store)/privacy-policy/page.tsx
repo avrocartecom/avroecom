@@ -3,9 +3,14 @@ export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 
 export default async function PrivacyPolicyPage() {
-  const customPage = await prisma.customPage.findUnique({
-    where: { slug: "privacy-policy" },
-  });
+  let customPage = null;
+  try {
+    customPage = await prisma.customPage.findUnique({
+      where: { slug: "privacy-policy" },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   const title = customPage?.title || "Privacy & Data Protection Policy";
   const rawContent = customPage?.content || `### 1. Information We Collect

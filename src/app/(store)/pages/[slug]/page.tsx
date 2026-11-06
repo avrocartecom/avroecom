@@ -12,9 +12,14 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const page = await prisma.customPage.findUnique({
-    where: { slug },
-  });
+  let page = null;
+  try {
+    page = await prisma.customPage.findUnique({
+      where: { slug },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   if (!page) {
     return { title: "Page Not Found" };
@@ -29,9 +34,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function DynamicCustomPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const page = await prisma.customPage.findUnique({
-    where: { slug },
-  });
+  let page = null;
+  try {
+    page = await prisma.customPage.findUnique({
+      where: { slug },
+    });
+  } catch (e) {
+    // Database unseeded or unreachable
+  }
 
   if (!page) {
     notFound();
