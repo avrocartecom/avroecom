@@ -14,7 +14,10 @@ import {
   Heart,
   Play,
   Film,
+  Star,
+  MessageSquare,
 } from "lucide-react";
+import { ProductReviews } from "@/components/product-reviews";
 
 export function ProductViewClient({ product }: { product: any }) {
   const router = useRouter();
@@ -86,8 +89,17 @@ export function ProductViewClient({ product }: { product: any }) {
 
   const embedUrl = product.videoUrl ? getEmbedVideoUrl(product.videoUrl) : null;
 
+  // Review statistics
+  const reviewsList = product.reviews || [];
+  const reviewCount = reviewsList.length;
+  const avgRating =
+    reviewCount > 0
+      ? (reviewsList.reduce((s: number, r: any) => s + r.rating, 0) / reviewCount).toFixed(1)
+      : "5.0";
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+    <div className="space-y-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
       {/* Media Gallery with Right Scroll View */}
       <div className="lg:col-span-7">
         <div className="flex flex-col-reverse md:flex-row gap-4 items-start">
@@ -205,7 +217,34 @@ export function ProductViewClient({ product }: { product: any }) {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] tracking-tight">
             {product.title}
           </h1>
-          <span className="text-xs text-slate-400 font-mono block mt-1">SKU: {currentSku}</span>
+          <div className="flex flex-wrap items-center gap-3 mt-2">
+            <span className="text-xs text-slate-400 font-mono">SKU: {currentSku}</span>
+            <span className="text-slate-300">•</span>
+            {/* Clickable Review Rating Anchor */}
+            <a
+              href="#product-reviews"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors group cursor-pointer"
+            >
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star
+                    key={s}
+                    className={`w-3.5 h-3.5 ${
+                      s <= Math.round(Number(avgRating))
+                        ? "fill-amber-400 text-amber-400"
+                        : "text-slate-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="font-bold text-slate-900 group-hover:text-blue-600">
+                {avgRating}
+              </span>
+              <span className="text-slate-500 underline decoration-slate-300 group-hover:decoration-blue-600">
+                ({reviewCount} customer {reviewCount === 1 ? "review" : "reviews"})
+              </span>
+            </a>
+          </div>
         </div>
 
         {/* Pricing */}
@@ -350,5 +389,15 @@ export function ProductViewClient({ product }: { product: any }) {
         </div>
       </div>
     </div>
+
+    {/* Verified Customer Reviews Section */}
+    <div className="border-t border-slate-200/90 pt-4">
+      <ProductReviews
+        productId={product.id}
+        productTitle={product.title}
+        initialReviews={reviewsList}
+      />
+    </div>
+  </div>
   );
 }

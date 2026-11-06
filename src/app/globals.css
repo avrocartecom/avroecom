@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Cinzel:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Quicksand:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -27,4 +27,198 @@
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     letter-spacing: -0.005em;
   }
+}
+
+/* ============================================================
+   AVRO STORE — PROFESSIONAL ANIMATION SYSTEM
+   ============================================================ */
+
+@layer utilities {
+
+  /* --- Fade & Slide Entrances --- */
+  .avro-fade-in {
+    animation: avroFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .avro-fade-in-delay-1 {
+    animation: avroFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+  .avro-fade-in-delay-2 {
+    animation: avroFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
+  .avro-fade-in-delay-3 {
+    animation: avroFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  }
+
+  .avro-slide-up {
+    animation: avroSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .avro-slide-up-delay-1 {
+    animation: avroSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  }
+  .avro-slide-up-delay-2 {
+    animation: avroSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+  }
+  .avro-slide-up-delay-3 {
+    animation: avroSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both;
+  }
+  .avro-slide-up-delay-4 {
+    animation: avroSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.48s both;
+  }
+
+  .avro-slide-right {
+    animation: avroSlideRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+
+  /* --- Shimmer / Skeleton --- */
+  .avro-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: avroShimmer 2s ease-in-out infinite;
+  }
+
+  /* --- Floating / Bob --- */
+  .avro-float {
+    animation: avroFloat 4s ease-in-out infinite;
+  }
+  .avro-float-slow {
+    animation: avroFloat 6s ease-in-out infinite;
+  }
+
+  /* --- Gradient Glow --- */
+  .avro-glow-pulse {
+    animation: avroGlowPulse 3s ease-in-out infinite;
+  }
+
+  /* --- Marquee Scroll (announcement bar) --- */
+  .avro-marquee {
+    display: flex;
+    width: max-content;
+    animation: avroMarquee 28s linear infinite;
+  }
+  .avro-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  /* --- Underline Slide --- */
+  .avro-link-underline {
+    position: relative;
+  }
+  .avro-link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .avro-link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* --- Card Lift --- */
+  .avro-card {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .avro-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  /* --- Image Zoom --- */
+  .avro-img-zoom img,
+  .avro-img-zoom {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .avro-img-zoom:hover img,
+  .group:hover .avro-img-zoom {
+    transform: scale(1.06);
+  }
+
+  /* --- Button Press --- */
+  .avro-btn {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, opacity 0.15s ease;
+    will-change: transform;
+  }
+  .avro-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  }
+  .avro-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* --- Stagger Grid Children --- */
+  .avro-stagger-grid > *:nth-child(1) { animation-delay: 0.05s; }
+  .avro-stagger-grid > *:nth-child(2) { animation-delay: 0.12s; }
+  .avro-stagger-grid > *:nth-child(3) { animation-delay: 0.19s; }
+  .avro-stagger-grid > *:nth-child(4) { animation-delay: 0.26s; }
+  .avro-stagger-grid > *:nth-child(5) { animation-delay: 0.33s; }
+  .avro-stagger-grid > *:nth-child(6) { animation-delay: 0.40s; }
+  .avro-stagger-grid > *:nth-child(7) { animation-delay: 0.47s; }
+  .avro-stagger-grid > *:nth-child(8) { animation-delay: 0.54s; }
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes avroFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes avroSlideUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes avroSlideRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes avroShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes avroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes avroGlowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(37,99,235,0.15); }
+  50%       { box-shadow: 0 0 40px rgba(37,99,235,0.35); }
+}
+
+@keyframes avroMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   GLOBAL POLISH
+   ============================================================ */
+::selection {
+  background: rgba(37, 99, 235, 0.18);
+  color: inherit;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus rings */
+*:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 4px;
 }

@@ -46,6 +46,10 @@ export default async function ShopCatalogPage({
         images: { orderBy: { sortOrder: "asc" } },
         variants: true,
         category: true,
+        reviews: {
+          where: { isApproved: true },
+          select: { rating: true },
+        },
       },
       orderBy,
     });

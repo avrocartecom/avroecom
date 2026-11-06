@@ -121,22 +121,32 @@ export function StoreNav({ theme }: { theme?: any }) {
 
   return (
     <header
-      className="sticky top-0 z-40 transition-colors duration-300 border-b"
+      className="sticky top-0 z-40 transition-all duration-300 border-b backdrop-blur-sm"
       style={{
         backgroundColor: matchingThemeDef.palette.headerBg,
         borderColor: matchingThemeDef.palette.border,
       }}
     >
-      {/* Announcement Bar */}
+      {/* Announcement Bar - scrolling marquee */}
       {showAnnouncement && (
         <div
-          className="py-1.5 px-4 text-center text-xs font-semibold tracking-wide transition-colors"
+          className="py-1.5 overflow-hidden transition-colors"
           style={{
             backgroundColor: matchingThemeDef.announcementBar.bg,
             color: matchingThemeDef.announcementBar.textColor,
           }}
         >
-          {announcementText}
+          <div className="avro-marquee text-xs font-semibold tracking-wide select-none">
+            {/* Duplicate for seamless loop */}
+            {[0, 1].map((i) => (
+              <span key={i} className="flex items-center gap-8 px-4 whitespace-nowrap">
+                {announcementText}
+                <span className="opacity-40">·</span>
+                {announcementText}
+                <span className="opacity-40">·</span>
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
@@ -169,61 +179,66 @@ export function StoreNav({ theme }: { theme?: any }) {
         <nav className="hidden md:flex items-center gap-7 text-xs font-semibold">
           <Link
             href="/"
-            className={`transition-colors ${
+            className={`avro-link-underline transition-colors ${
               pathname === "/"
-                ? "text-blue-500 font-bold"
+                ? "font-bold"
                 : isDarkNav
                 ? "text-slate-300 hover:text-white"
                 : "text-slate-600 hover:text-slate-900"
             }`}
+            style={pathname === "/" ? { color: matchingThemeDef.palette.accent } : {}}
           >
             Home
           </Link>
           <Link
             href="/shop"
-            className={`transition-colors ${
+            className={`avro-link-underline transition-colors ${
               pathname === "/shop"
-                ? "text-blue-500 font-bold"
+                ? "font-bold"
                 : isDarkNav
                 ? "text-slate-300 hover:text-white"
                 : "text-slate-600 hover:text-slate-900"
             }`}
+            style={pathname === "/shop" ? { color: matchingThemeDef.palette.accent } : {}}
           >
             Shop Catalog
           </Link>
           <Link
             href="/wishlist"
-            className={`transition-colors ${
+            className={`avro-link-underline transition-colors ${
               pathname === "/wishlist"
-                ? "text-blue-500 font-bold"
+                ? "font-bold"
                 : isDarkNav
                 ? "text-slate-300 hover:text-white"
                 : "text-slate-600 hover:text-slate-900"
             }`}
+            style={pathname === "/wishlist" ? { color: matchingThemeDef.palette.accent } : {}}
           >
             Wishlist
           </Link>
           <Link
             href="/track"
-            className={`transition-colors ${
+            className={`avro-link-underline transition-colors ${
               pathname === "/track"
-                ? "text-blue-500 font-bold"
+                ? "font-bold"
                 : isDarkNav
                 ? "text-slate-300 hover:text-white"
                 : "text-slate-600 hover:text-slate-900"
             }`}
+            style={pathname === "/track" ? { color: matchingThemeDef.palette.accent } : {}}
           >
             Track Order
           </Link>
           <Link
             href="/about"
-            className={`transition-colors ${
+            className={`avro-link-underline transition-colors ${
               pathname === "/about"
-                ? "text-blue-500 font-bold"
+                ? "font-bold"
                 : isDarkNav
                 ? "text-slate-300 hover:text-white"
                 : "text-slate-600 hover:text-slate-900"
             }`}
+            style={pathname === "/about" ? { color: matchingThemeDef.palette.accent } : {}}
           >
             About Us
           </Link>
@@ -486,3 +501,4 @@ export function StoreNav({ theme }: { theme?: any }) {
     </header>
   );
 }
+

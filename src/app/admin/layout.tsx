@@ -51,6 +51,7 @@ import {
   Radio,
   Share2,
   Package,
+  Star,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
@@ -264,6 +265,7 @@ export default function StoreAdminLayout({
         { label: "Inventory Control", href: "/admin/inventory", icon: BarChart3 },
         { label: "Collections", href: "/admin/collections", icon: Archive },
         { label: "Gift Cards", href: "/admin/gift-cards", icon: Gift },
+        { label: "Product Reviews", href: "/admin/reviews", icon: Star },
         { label: "Combo Deals & Bundles", href: "/admin/combos", icon: PackagePlus },
         { label: "Categories", href: "/admin/categories", icon: Package },
       ],

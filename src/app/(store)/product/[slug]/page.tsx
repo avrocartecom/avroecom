@@ -17,6 +17,10 @@ export default async function ProductDetailPage({
         images: { orderBy: { sortOrder: "asc" } },
         variants: true,
         category: true,
+        reviews: {
+          where: { isApproved: true },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
   } catch (e) {

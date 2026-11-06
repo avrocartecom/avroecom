@@ -905,7 +905,7 @@ export const AVRO_THEMES: AvroThemeDefinition[] = [
       badgeRadius: "rounded-full",
     },
     hero: {
-      badge: "AVRO STANDARD COMMERCE ENGINE 2026",
+      badge: "AVRO CURATED COLLECTIONS 2026",
       headline: "Find your next",
       headlineHighlight: "favourite.",
       subheadline: "Shop top-rated electronics, minimalist apparel, home furnishings, and daily curated finds — all with verified authenticity and fast delivery.",
