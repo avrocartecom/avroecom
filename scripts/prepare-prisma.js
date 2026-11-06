@@ -172,11 +172,23 @@ if (
     schema = schema.replace(/env\("DATABASE_URL"\)/g, `env("${urlEnvVar}")`);
   }
 
-  if ((directUrl || process.env[directEnvVar]) && !schema.includes("directUrl")) {
-    schema = schema.replace(
-      new RegExp(`url\\s*=\\s*env\\("${urlEnvVar}"\\)`, "g"),
-      `url       = env("${urlEnvVar}")\n  directUrl = env("${directEnvVar}")`
-    );
+  // Handle directUrl: Only include if explicitly provided, otherwise strip it to avoid missing env error
+  if (directUrl || process.env[directEnvVar]) {
+    if (!schema.includes("directUrl")) {
+      schema = schema.replace(
+        new RegExp(`url\\s*=\\s*env\\("${urlEnvVar}"\\)`, "g"),
+        `url       = env("${urlEnvVar}")\n  directUrl = env("${directEnvVar}")`
+      );
+    }
+  } else {
+    schema = schema.replace(/\s*directUrl\s*=\s*env\("[^"]+"\)/g, "");
+  }
+
+  // Ensure DATABASE_URL is present in process.env so prisma generate doesn't throw
+  if (!process.env[urlEnvVar] && !process.env.DATABASE_URL) {
+    const dummyDbUrl = "postgresql://postgres:postgres@localhost:5432/store?schema=store";
+    process.env[urlEnvVar] = dummyDbUrl;
+    process.env.DATABASE_URL = dummyDbUrl;
   }
 
   // Update .env file if it exists so Next.js build workers inherit it
