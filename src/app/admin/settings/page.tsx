@@ -18,6 +18,7 @@ import {
   ExternalLink,
   Layers,
   ArrowRight,
+  LifeBuoy,
 } from "lucide-react";
 
 export default function SettingsOverviewPage() {
@@ -79,11 +80,11 @@ export default function SettingsOverviewPage() {
       color: "bg-rose-50 text-rose-600 border-rose-200",
     },
     {
-      title: "Custom Domains",
-      desc: "Connect your primary brand domain (www.brand.com), DNS records, and SSL certificates.",
-      href: "/admin/settings/domains",
-      icon: Globe,
-      badge: "DNS Active",
+      title: "Central Support & SLA",
+      desc: "Open live engineering tickets, WhatsApp support, and technical assistance from Technext Central.",
+      href: "/admin/support",
+      icon: LifeBuoy,
+      badge: "SLA Active",
       color: "bg-teal-50 text-teal-600 border-teal-200",
     },
     {

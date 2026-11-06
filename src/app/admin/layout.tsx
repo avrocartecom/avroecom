@@ -32,6 +32,7 @@ import {
   Globe,
   Bell,
   Sliders,
+  LifeBuoy,
   ShieldCheck,
   Search,
   ExternalLink,
@@ -311,7 +312,7 @@ export default function StoreAdminLayout({
         { label: "Checkout & Accounts", href: "/admin/settings/checkout", icon: UserCheck },
         { label: "Shipping & Delivery", href: "/admin/settings/shipping", icon: Truck },
         { label: "Taxes & GST", href: "/admin/settings/taxes", icon: Receipt },
-        { label: "Custom Domains", href: "/admin/settings/domains", icon: Globe },
+        { label: "Central Support", href: "/admin/support", icon: LifeBuoy },
         { label: "Notifications", href: "/admin/settings/notifications", icon: Bell },
         { label: "Other Settings", href: "/admin/settings/other", icon: Sliders },
       ],
@@ -599,6 +600,16 @@ export default function StoreAdminLayout({
               </div>
             )}
           </div>
+
+          {/* Central Support Pill */}
+          <Link
+            href="/admin/support"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold text-[11px] hover:bg-blue-100 transition"
+            title="Technext Central Support"
+          >
+            <LifeBuoy className="w-3.5 h-3.5 text-blue-600" />
+            <span>Support</span>
+          </Link>
 
           {/* Store Live Pill */}
           <Link

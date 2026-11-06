@@ -67,12 +67,12 @@ export default function StoreDashboardPage() {
       btnText: "Configure Rates",
     },
     {
-      id: "domain",
-      title: "Connect your custom brand domain",
-      desc: "Point your A record to 76.76.21.21 to replace default subdomain.",
-      done: false,
-      href: "/admin/settings/domains",
-      btnText: "Connect Domain",
+      id: "support",
+      title: "Technext Central Merchant Support",
+      desc: "Direct SLA ticket hotline and developer assistance from central command.",
+      done: true,
+      href: "/admin/support",
+      btnText: "Open Support",
     },
   ]);
   const [showChecklist, setShowChecklist] = useState(true);
