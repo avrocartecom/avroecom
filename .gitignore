@@ -32,6 +32,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Native binary engines
+*.node
+
 # Operating System Files
 .DS_Store
 Thumbs.db
