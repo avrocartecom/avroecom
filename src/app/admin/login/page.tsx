@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   ShieldAlert,
   Lock,
-  Key,
   Eye,
   EyeOff,
   ArrowRight,
@@ -36,8 +35,8 @@ export default function StoreAdminLoginPage() {
   });
 
   // State
-  const [email, setEmail] = useState("storeadmin@example.com");
-  const [password, setPassword] = useState("storeadmin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState<"CREDENTIALS" | "2FA">("CREDENTIALS");
   const [twoFactorPin, setTwoFactorPin] = useState(["", "", "", "", "", ""]);
@@ -208,21 +207,6 @@ export default function StoreAdminLoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Prefill Demo Credentials Helper
-  const handlePrefillDemo = () => {
-    setEmail("storeadmin@example.com");
-    setPassword("storeadmin123");
-    setErrorMessage("");
-    setSuccessMessage("Preloaded owner credentials: storeadmin@example.com / storeadmin123");
-  };
-
-  const handlePrefill2FA = () => {
-    const code = "884920".split("");
-    setTwoFactorPin(code);
-    setErrorMessage("");
-    setSuccessMessage("Preloaded 2FA security PIN: 884920");
   };
 
   return (
@@ -453,7 +437,7 @@ export default function StoreAdminLoginPage() {
                     <div className="text-xs">
                       <p className="font-semibold text-white">Backoffice 2FA Challenge</p>
                       <p className="text-[11px] text-slate-400">
-                        Enter the 6-digit code or default PIN <span className="text-emerald-400 font-mono font-bold">884920</span>.
+                        Enter the 6-digit verification PIN to authorize this session.
                       </p>
                     </div>
                   </div>
@@ -499,7 +483,7 @@ export default function StoreAdminLoginPage() {
                       )}
                     </button>
 
-                    <div className="flex items-center justify-between text-xs pt-1">
+                    <div className="flex items-center justify-start text-xs pt-1">
                       <button
                         type="button"
                         onClick={() => {
@@ -511,48 +495,10 @@ export default function StoreAdminLoginPage() {
                         <RotateCcw className="w-3 h-3" />
                         Back to credentials
                       </button>
-                      <button
-                        type="button"
-                        onClick={handlePrefill2FA}
-                        className="text-emerald-400 hover:text-emerald-300 font-medium text-[11px]"
-                      >
-                        Fill Security PIN
-                      </button>
                     </div>
                   </div>
                 </form>
               )}
-
-              {/* Quick Credentials Demo Helper */}
-              <div className="pt-3 border-t border-slate-800 text-xs">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Key className="w-3.5 h-3.5 text-blue-400" />
-                    Default Store Credentials
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handlePrefillDemo}
-                    className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold underline"
-                  >
-                    Quick Prefill
-                  </button>
-                </div>
-                <div className="p-2.5 rounded-xl bg-[#061120] border border-slate-800 font-mono text-[11px] text-slate-300 flex flex-col gap-1">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Email:</span>
-                    <span className="text-white">storeadmin@example.com</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Password:</span>
-                    <span className="text-white">storeadmin123</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">2FA PIN:</span>
-                    <span className="text-emerald-400 font-bold">884920</span>
-                  </div>
-                </div>
-              </div>
 
               {/* POWERED BY AVRO BY TECHNEXT Brand Signature */}
               <div className="pt-2 text-center border-t border-slate-800/80">
