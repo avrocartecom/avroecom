@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { AVRO_THEMES, AvroThemeDefinition } from "@/lib/themes-registry";
 import { ProductCard } from "@/components/product-card";
+import { getCachedStoreTheme } from "@/lib/theme-cache";
+import { getStorePermissions } from "@/lib/permissions";
 
 function renderTrustIcon(icon: string) {
   switch (icon) {
@@ -52,7 +54,7 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
 
   let dbTheme: any = null;
   try {
-    dbTheme = await prisma.storeThemeSetting.findFirst();
+    dbTheme = await getCachedStoreTheme();
   } catch (e) {
     // Database unseeded or unreachable
   }
@@ -96,6 +98,9 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
   const subheadline = dbTheme?.bannerSubheadline && !themeParam ? dbTheme.bannerSubheadline : themeDef.hero.subheadline;
   const heroImage = dbTheme?.bannerImageUrl && !themeParam ? dbTheme.bannerImageUrl : themeDef.hero.imageUrl;
 
+  const permissions = await getStorePermissions();
+  const allowReviews = permissions.check("productReviews").allowed;
+
   let dbProducts: any[] = [];
   try {
     dbProducts = await prisma.product.findMany({
@@ -104,10 +109,12 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
         images: { orderBy: { sortOrder: "asc" } },
         variants: true,
         category: true,
-        reviews: {
-          where: { isApproved: true },
-          select: { rating: true },
-        },
+        reviews: allowReviews
+          ? {
+              where: { isApproved: true },
+              select: { rating: true },
+            }
+          : false,
       },
       take: 4,
       orderBy: { createdAt: "desc" },
@@ -578,7 +585,7 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 avro-stagger-grid">
             {dbProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p.id} product={p} showReviews={allowReviews} />
             ))}
           </div>
         </section>
@@ -609,7 +616,9 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
               Engineered for Quality & Reliability
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Discover our carefully curated catalog with verified customer reviews, transparent pricing, and rapid doorstep delivery across India.
+              {allowReviews
+                ? "Discover our carefully curated catalog with verified customer reviews, transparent pricing, and rapid doorstep delivery across India."
+                : "Discover our carefully curated catalog with premium quality, transparent pricing, and rapid doorstep delivery across India."}
             </p>
           </div>
 

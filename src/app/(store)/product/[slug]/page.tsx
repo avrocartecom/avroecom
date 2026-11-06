@@ -3,12 +3,16 @@ export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ProductViewClient } from "@/components/product-view-client";
+import { getStorePermissions } from "@/lib/permissions";
 
 export default async function ProductDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
+  const permissions = await getStorePermissions();
+  const allowReviews = permissions.check("productReviews").allowed;
+
   let product = null;
   try {
     product = await prisma.product.findUnique({
@@ -17,10 +21,12 @@ export default async function ProductDetailPage({
         images: { orderBy: { sortOrder: "asc" } },
         variants: true,
         category: true,
-        reviews: {
-          where: { isApproved: true },
-          orderBy: { createdAt: "desc" },
-        },
+        reviews: allowReviews
+          ? {
+              where: { isApproved: true },
+              orderBy: { createdAt: "desc" },
+            }
+          : false,
       },
     });
   } catch (e) {
@@ -33,7 +39,7 @@ export default async function ProductDetailPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <ProductViewClient product={product} />
+      <ProductViewClient product={product} allowReviews={allowReviews} />
     </div>
   );
 }

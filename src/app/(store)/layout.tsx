@@ -8,6 +8,7 @@ import { StoreNav } from "@/components/store-nav";
 import StoreFooter from "@/components/store-footer";
 import { ThemePreviewDock } from "@/components/theme-preview-dock";
 import { getStoreLicenseStatus } from "@/lib/license-client";
+import { getCachedStoreTheme } from "@/lib/theme-cache";
 import { AlertOctagon, Key, ShieldAlert, ArrowRight, ExternalLink, RefreshCw } from "lucide-react";
 
 export default async function StoreLayout({
@@ -17,7 +18,7 @@ export default async function StoreLayout({
 }) {
   let theme: any = null;
   try {
-    theme = await prisma.storeThemeSetting.findFirst();
+    theme = await getCachedStoreTheme();
   } catch (e) {
     // Database unseeded or unreachable
   }

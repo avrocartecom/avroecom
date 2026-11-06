@@ -36,10 +36,25 @@ export interface StorePermissionsContext {
   featureMatrix: Record<FeatureKey, CheckAccessResult>;
 }
 
+// In-memory micro-cache to eliminate redundant PostgreSQL lookups across simultaneous server components
+let cachedPermissionsContext: StorePermissionsContext | null = null;
+let cachedPermissionsTimestamp = 0;
+const PERMISSIONS_CACHE_TTL_MS = 15000; // 15 seconds
+
+export function invalidateStorePermissionsCache() {
+  cachedPermissionsContext = null;
+  cachedPermissionsTimestamp = 0;
+}
+
 /**
  * Loads current store subscription, plan tier, entitlements, and custom addons from database.
  */
 export async function getStorePermissions(): Promise<StorePermissionsContext> {
+  const nowMs = Date.now();
+  if (cachedPermissionsContext && nowMs - cachedPermissionsTimestamp < PERMISSIONS_CACHE_TTL_MS) {
+    return cachedPermissionsContext;
+  }
+
   let cache: any = null;
   try {
     cache = await prisma.licenseCache.findFirst({
@@ -89,7 +104,7 @@ export async function getStorePermissions(): Promise<StorePermissionsContext> {
     featureMatrix[key] = check(key);
   });
 
-  return {
+  const context: StorePermissionsContext = {
     valid: !isExpired,
     status: isExpired ? "EXPIRED" : status,
     plan,
@@ -103,6 +118,11 @@ export async function getStorePermissions(): Promise<StorePermissionsContext> {
     check,
     featureMatrix,
   };
+
+  cachedPermissionsContext = context;
+  cachedPermissionsTimestamp = Date.now();
+
+  return context;
 }
 
 /**

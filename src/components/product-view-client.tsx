@@ -19,7 +19,13 @@ import {
 } from "lucide-react";
 import { ProductReviews } from "@/components/product-reviews";
 
-export function ProductViewClient({ product }: { product: any }) {
+export function ProductViewClient({
+  product,
+  allowReviews = true,
+}: {
+  product: any;
+  allowReviews?: boolean;
+}) {
   const router = useRouter();
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
@@ -219,31 +225,35 @@ export function ProductViewClient({ product }: { product: any }) {
           </h1>
           <div className="flex flex-wrap items-center gap-3 mt-2">
             <span className="text-xs text-slate-400 font-mono">SKU: {currentSku}</span>
-            <span className="text-slate-300">•</span>
-            {/* Clickable Review Rating Anchor */}
-            <a
-              href="#product-reviews"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors group cursor-pointer"
-            >
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star
-                    key={s}
-                    className={`w-3.5 h-3.5 ${
-                      s <= Math.round(Number(avgRating))
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-slate-300"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="font-bold text-slate-900 group-hover:text-blue-600">
-                {avgRating}
-              </span>
-              <span className="text-slate-500 underline decoration-slate-300 group-hover:decoration-blue-600">
-                ({reviewCount} customer {reviewCount === 1 ? "review" : "reviews"})
-              </span>
-            </a>
+            {allowReviews && (
+              <>
+                <span className="text-slate-300">•</span>
+                {/* Clickable Review Rating Anchor */}
+                <a
+                  href="#product-reviews"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors group cursor-pointer"
+                >
+                  <div className="flex items-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        className={`w-3.5 h-3.5 ${
+                          s <= Math.round(Number(avgRating))
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-slate-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-bold text-slate-900 group-hover:text-blue-600">
+                    {avgRating}
+                  </span>
+                  <span className="text-slate-500 underline decoration-slate-300 group-hover:decoration-blue-600">
+                    ({reviewCount} customer {reviewCount === 1 ? "review" : "reviews"})
+                  </span>
+                </a>
+              </>
+            )}
           </div>
         </div>
 
@@ -391,13 +401,15 @@ export function ProductViewClient({ product }: { product: any }) {
     </div>
 
     {/* Verified Customer Reviews Section */}
-    <div className="border-t border-slate-200/90 pt-4">
-      <ProductReviews
-        productId={product.id}
-        productTitle={product.title}
-        initialReviews={reviewsList}
-      />
-    </div>
+    {allowReviews && (
+      <div className="border-t border-slate-200/90 pt-4">
+        <ProductReviews
+          productId={product.id}
+          productTitle={product.title}
+          initialReviews={reviewsList}
+        />
+      </div>
+    )}
   </div>
   );
 }

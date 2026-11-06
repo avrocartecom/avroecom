@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { invalidateStoreThemeCache } from "@/lib/theme-cache";
 
 // GET: Fetch General & Branding Settings
 export async function GET() {
@@ -127,6 +128,8 @@ export async function PUT(req: NextRequest) {
         accentColor: accentColor || "#2563EB",
       },
     });
+
+    invalidateStoreThemeCache();
 
     return NextResponse.json({
       success: true,

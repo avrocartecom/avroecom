@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { enforceApiFeatureAccess } from "@/lib/permissions";
+import { invalidateStoreThemeCache } from "@/lib/theme-cache";
 
 export async function GET() {
   try {
@@ -145,6 +146,7 @@ export async function PUT(req: NextRequest) {
       },
     });
 
+    invalidateStoreThemeCache();
     return NextResponse.json({ success: true, message: "Theme customization saved & deployed!", theme: updated });
   } catch (err: any) {
     console.error("Theme PUT error:", err);

@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { ProductCard } from "@/components/product-card";
 import Link from "next/link";
 import { Search, Filter } from "lucide-react";
+import { getStorePermissions } from "@/lib/permissions";
 
 export default async function ShopCatalogPage({
   searchParams,
@@ -11,6 +12,8 @@ export default async function ShopCatalogPage({
   searchParams: { category?: string; search?: string; sort?: string };
 }) {
   const { category, search, sort } = searchParams;
+  const permissions = await getStorePermissions();
+  const allowReviews = permissions.check("productReviews").allowed;
 
   let categories: any[] = [];
   try {
@@ -46,10 +49,12 @@ export default async function ShopCatalogPage({
         images: { orderBy: { sortOrder: "asc" } },
         variants: true,
         category: true,
-        reviews: {
-          where: { isApproved: true },
-          select: { rating: true },
-        },
+        reviews: allowReviews
+          ? {
+              where: { isApproved: true },
+              select: { rating: true },
+            }
+          : false,
       },
       orderBy,
     });
@@ -106,7 +111,7 @@ export default async function ShopCatalogPage({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p.id} product={p} showReviews={allowReviews} />
           ))}
         </div>
       )}

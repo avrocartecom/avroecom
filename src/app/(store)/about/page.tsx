@@ -3,13 +3,14 @@ export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 import { ShieldCheck, Truck, Award, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { getCachedStoreTheme } from "@/lib/theme-cache";
 
 export default async function AboutPage() {
   let theme: any = null;
   let customAboutPage: any = null;
   try {
     const [t, p] = await Promise.all([
-      prisma.storeThemeSetting.findFirst(),
+      getCachedStoreTheme(),
       prisma.customPage.findUnique({ where: { slug: "about" } }),
     ]);
     theme = t;

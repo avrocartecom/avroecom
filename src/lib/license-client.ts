@@ -19,10 +19,25 @@ export interface LicenseStatusResult {
   message?: string;
 }
 
+// In-memory micro-cache for license status
+let cachedLicenseStatus: LicenseStatusResult | null = null;
+let cachedLicenseStatusTimestamp = 0;
+const LICENSE_STATUS_CACHE_TTL_MS = 15000;
+
+export function invalidateLicenseStatusCache() {
+  cachedLicenseStatus = null;
+  cachedLicenseStatusTimestamp = 0;
+}
+
 /**
  * Retrieves the local license cache and optionally validates against Central API if expired.
  */
 export async function getStoreLicenseStatus(): Promise<LicenseStatusResult> {
+  const nowMs = Date.now();
+  if (cachedLicenseStatus && nowMs - cachedLicenseStatusTimestamp < LICENSE_STATUS_CACHE_TTL_MS) {
+    return cachedLicenseStatus;
+  }
+
   try {
     const cache = await prisma.licenseCache.findFirst({
       orderBy: { updatedAt: "desc" },
@@ -65,7 +80,7 @@ export async function getStoreLicenseStatus(): Promise<LicenseStatusResult> {
       };
     }
 
-    return {
+    const result: LicenseStatusResult = {
       valid: true,
       status: cache.status,
       plan: cache.plan as PlanTier,
@@ -75,6 +90,11 @@ export async function getStoreLicenseStatus(): Promise<LicenseStatusResult> {
       isGracePeriod: isGrace,
       message: isGrace ? "Operating within 72-hour offline grace period." : "License active and in good standing.",
     };
+
+    cachedLicenseStatus = result;
+    cachedLicenseStatusTimestamp = Date.now();
+
+    return result;
   } catch (err: any) {
     // Database connection or table not found
     return {
@@ -149,6 +169,8 @@ export async function syncLicenseWithCentral(): Promise<{
         gracePeriodUntil: graceExpiry,
       },
     });
+
+    invalidateLicenseStatusCache();
 
     return {
       success: true,
@@ -257,6 +279,8 @@ export async function updateStoreLicenseKey({
         centralApiUrl: targetCentralUrl,
       },
     });
+
+    invalidateLicenseStatusCache();
 
     const newStatus = await getStoreLicenseStatus();
 

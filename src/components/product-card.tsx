@@ -6,7 +6,13 @@ import { useCart } from "@/context/cart-context";
 import { useWishlist } from "@/context/wishlist-context";
 import { useState } from "react";
 
-export function ProductCard({ product }: { product: any }) {
+export function ProductCard({
+  product,
+  showReviews = true,
+}: {
+  product: any;
+  showReviews?: boolean;
+}) {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [added, setAdded] = useState(false);
@@ -146,7 +152,7 @@ export function ProductCard({ product }: { product: any }) {
           </Link>
 
           {/* Stars & Rating Summary */}
-          {(() => {
+          {showReviews && (() => {
             const reviewsCount = product.reviews?.length || 0;
             const computedRating =
               reviewsCount > 0

@@ -153,6 +153,11 @@ export default function StoreAdminLayout({
       return;
     }
 
+    if (adminUser) {
+      setCheckingAuth(false);
+      return;
+    }
+
     let isMounted = true;
     fetch("/api/admin/auth/me")
       .then((res) => {
@@ -177,7 +182,7 @@ export default function StoreAdminLayout({
     return () => {
       isMounted = false;
     };
-  }, [pathname, isLoginPage, router]);
+  }, [isLoginPage, router, adminUser]);
 
   const loadPermissions = () => {
     fetch("/api/admin/permissions")
@@ -190,7 +195,7 @@ export default function StoreAdminLayout({
       .catch(() => {});
   };
 
-  // License & Broadcasts loader
+  // License & Broadcasts loader - loaded once on initial mount
   useEffect(() => {
     if (isLoginPage) return;
 
@@ -204,7 +209,7 @@ export default function StoreAdminLayout({
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [pathname, isLoginPage]);
+  }, [isLoginPage]);
 
   // Global Keyboard Shortcuts (Cmd+K / Ctrl+K for search, ? for shortcuts)
   useEffect(() => {
