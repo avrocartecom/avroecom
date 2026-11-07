@@ -410,6 +410,35 @@ export function ProductViewClient({
         />
       </div>
     )}
+
+    {/* Mobile Sticky Quick-Purchase Bar */}
+    <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 flex items-center justify-between gap-3 z-40 sm:hidden shadow-2xl">
+      <div className="min-w-0">
+        <span className="text-[10px] text-slate-400 block font-semibold uppercase">Total Price</span>
+        <span className="text-base font-black text-slate-900 block leading-tight truncate">
+          ₹{currentPrice.toLocaleString("en-IN")}
+        </span>
+      </div>
+      <div className="flex items-center gap-2 flex-1 max-w-[220px]">
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          className={`flex-1 py-2.5 px-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+            added ? "bg-emerald-600 text-white" : "bg-slate-900 text-white"
+          }`}
+        >
+          {added ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+          <span>{added ? "Added" : "Cart"}</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleBuyNow}
+          className="flex-1 py-2.5 px-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-[11px] uppercase tracking-wider shadow-sm"
+        >
+          Buy Now
+        </button>
+      </div>
+    </div>
   </div>
   );
 }

@@ -403,87 +403,161 @@ export function StoreNav({ theme }: { theme?: any }) {
           {/* Mobile menu toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-2 rounded-lg ${
-              isDarkNav ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"
+            className={`md:hidden p-2 rounded-xl transition-colors ${
+              isDarkNav ? "text-slate-200 hover:bg-white/10" : "text-slate-700 hover:bg-slate-100"
             }`}
+            aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Responsive Themed Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200/80 bg-white p-4 space-y-3">
-          <Link
-            href="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-sm font-semibold text-slate-800"
-          >
-            Home
-          </Link>
+        <div
+          className="md:hidden border-t transition-all duration-300 p-4 space-y-4 animate-in slide-in-from-top-2 shadow-2xl"
+          style={{
+            backgroundColor: matchingThemeDef.palette.headerBg,
+            borderColor: matchingThemeDef.palette.border,
+            color: isDarkNav ? "#F1F5F9" : "#0F172A",
+          }}
+        >
+          {/* Quick Search Jump for Mobile */}
           <Link
             href="/shop"
             onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-sm font-semibold text-slate-800"
+            className="flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-semibold transition"
+            style={{
+              backgroundColor: isDarkNav ? "rgba(255,255,255,0.06)" : "#F8FAFC",
+              borderColor: isDarkNav ? "rgba(255,255,255,0.12)" : "#E2E8F0",
+              color: isDarkNav ? "#CBD5E1" : "#64748B",
+            }}
           >
-            Shop Catalog
-          </Link>
-          <Link
-            href="/wishlist"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between py-2 text-sm font-semibold text-slate-800"
-          >
-            <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-rose-500" />
-              <span>Wishlist</span>
-            </div>
-            {wishlistCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-xs font-bold">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
-          <Link
-            href="/track"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-sm font-semibold text-slate-800"
-          >
-            Track Order
-          </Link>
-          <Link
-            href="/about"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-sm font-semibold text-slate-800"
-          >
-            About Us
+            <span className="text-[11px]">Search products, collections, brands...</span>
           </Link>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+          {/* Navigation Links with Theme Accents */}
+          <div className="space-y-1 text-sm font-bold divide-y divide-black/5 dark:divide-white/5">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center justify-between py-2.5 px-2 rounded-lg transition-colors ${
+                pathname === "/" ? "font-extrabold" : "opacity-80 hover:opacity-100"
+              }`}
+              style={pathname === "/" ? { color: matchingThemeDef.palette.accent } : {}}
+            >
+              <span>Home</span>
+              {pathname === "/" && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+            </Link>
+
+            <Link
+              href="/shop"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center justify-between py-2.5 px-2 rounded-lg transition-colors ${
+                pathname === "/shop" ? "font-extrabold" : "opacity-80 hover:opacity-100"
+              }`}
+              style={pathname === "/shop" ? { color: matchingThemeDef.palette.accent } : {}}
+            >
+              <span>Shop All Products</span>
+              {pathname === "/shop" && <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+            </Link>
+
+            <Link
+              href="/wishlist"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between py-2.5 px-2 rounded-lg opacity-80 hover:opacity-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Heart className={`w-4 h-4 ${wishlistCount > 0 ? "fill-rose-500 text-rose-500" : ""}`} />
+                <span>My Wishlist</span>
+              </div>
+              {wishlistCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
+            <Link
+              href="/track"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center justify-between py-2.5 px-2 rounded-lg transition-colors ${
+                pathname === "/track" ? "font-extrabold" : "opacity-80 hover:opacity-100"
+              }`}
+              style={pathname === "/track" ? { color: matchingThemeDef.palette.accent } : {}}
+            >
+              <span>Track Orders</span>
+            </Link>
+
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center justify-between py-2.5 px-2 rounded-lg transition-colors ${
+                pathname === "/about" ? "font-extrabold" : "opacity-80 hover:opacity-100"
+              }`}
+              style={pathname === "/about" ? { color: matchingThemeDef.palette.accent } : {}}
+            >
+              <span>About Us</span>
+            </Link>
+          </div>
+
+          {/* Customer Profile / Sign In Section for Mobile */}
+          <div
+            className="pt-3 border-t space-y-2.5"
+            style={{ borderColor: isDarkNav ? "rgba(255,255,255,0.08)" : "#E2E8F0" }}
+          >
             {customer ? (
-              <div className="flex items-center justify-between w-full">
-                <span className="text-xs font-bold text-slate-900">{customer.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="text-xs text-rose-600 font-bold hover:underline"
-                >
-                  Log Out
-                </button>
+              <div
+                className="p-3 rounded-2xl border space-y-2"
+                style={{
+                  backgroundColor: isDarkNav ? "rgba(255,255,255,0.04)" : "#F8FAFC",
+                  borderColor: isDarkNav ? "rgba(255,255,255,0.08)" : "#E2E8F0",
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0">
+                    <p className="font-extrabold text-xs truncate">{customer.name}</p>
+                    <p className="text-[10px] opacity-60 font-mono truncate">{customer.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="text-xs text-rose-500 font-bold hover:underline ml-2"
+                  >
+                    Log Out
+                  </button>
+                </div>
+                {!customer.isGuest && (
+                  <Link
+                    href="/account"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-center py-2 rounded-xl text-xs font-bold text-white shadow-xs"
+                    style={{ backgroundColor: matchingThemeDef.palette.accent }}
+                  >
+                    Manage Orders & Account
+                  </Link>
+                )}
               </div>
             ) : (
-              <div className="flex items-center gap-2 w-full">
+              <div className="grid grid-cols-2 gap-2">
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 bg-blue-600 text-white rounded-xl text-xs font-bold"
+                  className="text-center py-2.5 px-3 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  style={{ backgroundColor: matchingThemeDef.palette.primary }}
                 >
                   Sign In
                 </Link>
                 <button
                   onClick={handleInstantGuestLogin}
-                  className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold"
+                  className="py-2.5 px-3 rounded-xl text-xs font-bold border transition text-center"
+                  style={{
+                    backgroundColor: isDarkNav ? "rgba(255,255,255,0.08)" : "#F1F5F9",
+                    borderColor: isDarkNav ? "rgba(255,255,255,0.12)" : "#E2E8F0",
+                    color: isDarkNav ? "#FFFFFF" : "#1E293B",
+                  }}
                 >
-                  Guest Mode
+                  Guest Shopper
                 </button>
               </div>
             )}

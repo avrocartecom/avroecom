@@ -74,7 +74,7 @@ export default async function ShopCatalogPage({
         </div>
 
         {/* Categories Bar */}
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap gap-2 text-xs w-full sm:w-auto scrollbar-none">
           <Link
             href="/shop"
             className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
@@ -109,7 +109,7 @@ export default async function ShopCatalogPage({
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} showReviews={allowReviews} />
           ))}

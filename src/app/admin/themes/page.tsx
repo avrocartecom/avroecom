@@ -740,7 +740,7 @@ export default function ThemesAdminPage() {
         {/* Action Buttons & Tabs */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Main Navigation Tabs */}
-          <div className="flex p-1 bg-slate-200/80 rounded-xl text-xs font-bold">
+          <div className="flex overflow-x-auto p-1 bg-slate-200/80 rounded-xl text-xs font-bold scrollbar-none max-w-full">
             <button
               onClick={() => setActiveTab("EDITOR")}
               className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${

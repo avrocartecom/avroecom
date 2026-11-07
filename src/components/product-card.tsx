@@ -80,14 +80,14 @@ export function ProductCard({
           )}
         </div>
 
-        {/* Action buttons — appear on hover */}
+        {/* Action buttons — always accessible on mobile, appear on hover on desktop */}
         <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5 z-10">
           {/* Wishlist */}
           <button
             type="button"
             onClick={handleWishlistToggle}
-            className="p-2 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-200
-                       opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100
+            className="p-2 rounded-xl bg-white/95 backdrop-blur-sm shadow-sm transition-all duration-200
+                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100 scale-100 sm:scale-90 sm:group-hover:scale-100
                        hover:bg-white active:scale-95"
             title={isSaved ? "Remove from wishlist" : "Save to wishlist"}
           >
@@ -98,8 +98,8 @@ export function ProductCard({
           <Link
             href={`/product/${product.slug}`}
             onClick={(e) => e.stopPropagation()}
-            className="p-2 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm text-slate-400 hover:text-slate-800
-                       opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 delay-75"
+            className="p-2 rounded-xl bg-white/95 backdrop-blur-sm shadow-sm text-slate-400 hover:text-slate-800
+                       opacity-0 sm:group-hover:opacity-100 scale-90 sm:group-hover:scale-100 transition-all duration-200 delay-75"
             title="View product"
           >
             <Eye className="w-4 h-4" />
@@ -193,16 +193,17 @@ export function ProductCard({
             )}
           </div>
 
-          {/* Desktop add button (hidden on mobile since overlay is used) */}
+          {/* 1-Tap Add to Cart button (active on both mobile & desktop) */}
           <button
             type="button"
             onClick={handleQuickAdd}
-            className={`hidden sm:flex p-2 rounded-xl transition-all shadow-sm active:scale-95 items-center justify-center ${
+            className={`flex p-2.5 sm:p-2 rounded-xl transition-all shadow-sm active:scale-95 items-center justify-center cursor-pointer ${
               added
                 ? "bg-emerald-600 text-white"
-                : "bg-slate-100 hover:bg-slate-900 text-slate-700 hover:text-white"
+                : "bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white"
             }`}
             title="Quick add to cart"
+            aria-label="Add to cart"
           >
             {added ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
           </button>

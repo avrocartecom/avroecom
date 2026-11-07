@@ -50,6 +50,7 @@ export function HeroBannerSlider({
 }: HeroBannerSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
   const activeSlides = Array.isArray(slides) && slides.length > 0 ? slides : [];
@@ -83,6 +84,28 @@ export function HeroBannerSlider({
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
+  // Touch Swipe Gesture Handlers for Mobile Devices
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setIsPaused(false);
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+
+    if (diff > 45) {
+      // Swiped Left -> Advance to next slide
+      handleNext();
+    } else if (diff < -45) {
+      // Swiped Right -> Go to prev slide
+      handlePrev();
+    }
+    setTouchStartX(null);
   };
 
   const btnRadiusStyle =
@@ -145,7 +168,9 @@ export function HeroBannerSlider({
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative overflow-hidden aspect-[4/5] shadow-2xl border transition-all group select-none"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative overflow-hidden aspect-[4/5] min-h-[360px] sm:min-h-[440px] shadow-2xl border transition-all group select-none touch-pan-y"
       style={{
         borderColor: isDarkHero ? "rgba(255,255,255,0.15)" : themeDef.palette.border,
         borderRadius: themeDef.typography.buttonRadius === "rounded-none" ? "0px" : "24px",
@@ -285,7 +310,7 @@ export function HeroBannerSlider({
           <button
             type="button"
             onClick={handlePrev}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-20 backdrop-blur-sm border border-white/20 cursor-pointer shadow-md"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 z-20 backdrop-blur-sm border border-white/20 cursor-pointer shadow-md active:scale-95"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -293,7 +318,7 @@ export function HeroBannerSlider({
           <button
             type="button"
             onClick={handleNext}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-20 backdrop-blur-sm border border-white/20 cursor-pointer shadow-md"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-all opacity-80 sm:opacity-0 sm:group-hover:opacity-100 z-20 backdrop-blur-sm border border-white/20 cursor-pointer shadow-md active:scale-95"
             aria-label="Next slide"
           >
             <ChevronRight className="w-4 h-4" />

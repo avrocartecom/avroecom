@@ -525,42 +525,42 @@ export default function OrdersAdminPage() {
         </div>
       )}
 
-      {/* Metric KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+      {/* Metric KPI Cards (2 cols on mobile, 4 on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Gross Sales</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">Gross Sales</span>
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
           </div>
-          <p className="text-2xl font-extrabold text-[#0A192F]">₹{totalGross.toLocaleString("en-IN")}</p>
-          <span className="text-[10px] text-slate-400">Total customer orders placed</span>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#0A192F] truncate">₹{totalGross.toLocaleString("en-IN")}</p>
+          <span className="text-[9px] sm:text-[10px] text-slate-400 block truncate">Customer orders placed</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Awaiting Dispatch</span>
-            <Clock className="w-4 h-4 text-amber-500" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">Awaiting Dispatch</span>
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
           </div>
-          <p className="text-2xl font-extrabold text-[#0A192F]">{pendingCount}</p>
-          <span className="text-[10px] text-amber-600 font-semibold">Orders ready for packing</span>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#0A192F]">{pendingCount}</p>
+          <span className="text-[9px] sm:text-[10px] text-amber-600 font-semibold block truncate">Ready for packing</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">In Transit & Shipped</span>
-            <Truck className="w-4 h-4 text-blue-600" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">In Transit</span>
+            <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
           </div>
-          <p className="text-2xl font-extrabold text-[#0A192F]">{shippedCount}</p>
-          <span className="text-[10px] text-blue-600 font-semibold">Dispatched with active AWB</span>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#0A192F]">{shippedCount}</p>
+          <span className="text-[9px] sm:text-[10px] text-blue-600 font-semibold block truncate">Dispatched with AWB</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Delivered</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">Delivered</span>
+            <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
           </div>
-          <p className="text-2xl font-extrabold text-[#0A192F]">{deliveredCount}</p>
-          <span className="text-[10px] text-emerald-600 font-semibold">Successfully completed</span>
+          <p className="text-xl sm:text-2xl font-extrabold text-[#0A192F]">{deliveredCount}</p>
+          <span className="text-[9px] sm:text-[10px] text-emerald-600 font-semibold block truncate">Successfully completed</span>
         </div>
       </div>
 

@@ -414,8 +414,8 @@ export default async function StoreHomePage({ searchParams }: PageProps) {
           </Link>
         </div>
 
-        {/* Product Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 avro-stagger-grid">
+        {/* Product Cards Grid — 2 columns on mobile, 4 on desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 avro-stagger-grid">
           {themeDef.sampleProducts.map((p) => {
             const hasDiscount = p.compareAtPrice && p.compareAtPrice > p.price;
             const discountPct = hasDiscount

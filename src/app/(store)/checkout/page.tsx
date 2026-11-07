@@ -172,10 +172,10 @@ export default function StoreCheckoutPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
         {/* Left Form */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-4 sm:p-8 shadow-sm space-y-6">
           <div>
             <h1 className="text-2xl font-extrabold text-[#0A192F]">Checkout</h1>
             <p className="text-xs text-slate-500 mt-1">

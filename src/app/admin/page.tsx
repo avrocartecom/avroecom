@@ -262,80 +262,80 @@ export default function StoreDashboardPage() {
         </div>
       )}
 
-      {/* Primary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Primary KPI Cards (2 cols on mobile, 4 on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Gross Sales */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
+        <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Total Sales Volume
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Sales Volume
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900">
+          <p className="text-xl sm:text-2xl font-black text-slate-900 truncate">
             ₹{stats?.totalSales?.toLocaleString("en-IN") || 0}
           </p>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-emerald-600 font-bold">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] sm:text-[11px] gap-0.5">
+            <span className="text-emerald-600 font-bold truncate">
               Today: ₹{stats?.todaySales?.toLocaleString("en-IN") || 0}
             </span>
-            <span className="text-slate-400 font-medium">100% Direct Revenue</span>
+            <span className="text-slate-400 font-medium hidden sm:inline">100% Direct</span>
           </div>
         </div>
 
         {/* Orders Processed */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
+        <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Orders Processed
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Orders
             </span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <ShoppingBag className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900">{stats?.totalOrders || 0}</p>
-          <div className="flex items-center justify-between text-[11px]">
+          <p className="text-xl sm:text-2xl font-black text-slate-900">{stats?.totalOrders || 0}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] sm:text-[11px] gap-0.5">
             <span className="text-blue-600 font-bold">AOV: ₹{stats?.averageOrderValue || 0}</span>
-            <span className="text-slate-400 font-medium">{stats?.processingOrders || 0} In Packaging</span>
+            <span className="text-slate-400 font-medium hidden sm:inline">{stats?.processingOrders || 0} In Packaging</span>
           </div>
         </div>
 
         {/* Catalog SKUs & Combos */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
+        <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Catalog Offerings
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Offerings
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <Layers className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900">{stats?.totalProducts || 0} Products</p>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-purple-600 font-bold">{stats?.comboDealsCount || 0} Combo Bundles</span>
-            <Link href="/admin/combos" className="text-blue-600 hover:underline font-bold">
+          <p className="text-xl sm:text-2xl font-black text-slate-900 truncate">{stats?.totalProducts || 0} Items</p>
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+            <span className="text-purple-600 font-bold truncate">{stats?.comboDealsCount || 0} Combos</span>
+            <Link href="/admin/combos" className="text-blue-600 hover:underline font-bold text-[10px] ml-1">
               Manage &rarr;
             </Link>
           </div>
         </div>
 
         {/* Customers & Shoppers */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
+        <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 hover:shadow-md transition">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Store Shoppers
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Shoppers
             </span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900">{stats?.totalCustomers || 0} Customers</p>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-amber-700 font-bold">{stats?.guestCustomers || 0} Guest Shoppers</span>
-            <Link href="/admin/customers" className="text-blue-600 hover:underline font-bold">
-              View All &rarr;
+          <p className="text-xl sm:text-2xl font-black text-slate-900 truncate">{stats?.totalCustomers || 0} Buyers</p>
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+            <span className="text-amber-700 font-bold truncate">{stats?.guestCustomers || 0} Guests</span>
+            <Link href="/admin/customers" className="text-blue-600 hover:underline font-bold text-[10px] ml-1">
+              View &rarr;
             </Link>
           </div>
         </div>

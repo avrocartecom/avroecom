@@ -255,7 +255,7 @@ export default function StoreAdminSupportPage() {
             </button>
           </div>
 
-          <div className="divide-y divide-slate-100 flex-1 overflow-y-auto max-h-[500px]">
+          <div className="divide-y divide-slate-100 flex-1 overflow-y-auto max-h-[260px] lg:max-h-[500px]">
             {loading && tickets.length === 0 ? (
               <div className="p-6 text-xs text-slate-400 text-center">Loading ticket queue...</div>
             ) : tickets.length === 0 ? (

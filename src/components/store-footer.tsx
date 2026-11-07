@@ -76,9 +76,9 @@ export default function StoreFooter({ theme }: { theme?: any }) {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* 1. Industry Trust Badges Strip */}
+        {/* 1. Industry Trust Badges Strip (2 cols on mobile, 4 on desktop) */}
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-12 border-b text-xs"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pb-12 border-b text-xs"
           style={{ borderColor: isDarkFooter ? "rgba(255,255,255,0.1)" : "#E2E8F0" }}
         >
           {matchingThemeDef.trustBadges.map((badge, idx) => (
@@ -196,172 +196,175 @@ export default function StoreFooter({ theme }: { theme?: any }) {
             </div>
           </div>
 
-          {/* Column 2: Collections & Shop (2 cols) */}
-          <div className="lg:col-span-2 space-y-3">
-            <strong
-              className="uppercase font-bold tracking-wider text-[11px] block"
-              style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
-            >
-              Collections
-            </strong>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/shop"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  All Products
-                </Link>
-              </li>
-              {matchingThemeDef.sampleCategories.slice(0, 4).map((c) => (
-                <li key={c.slug}>
+          {/* Columns 2, 3, 4: Quick Links Subgrid (2 cols on mobile, 3 cols on sm/md, 7 cols on lg) */}
+          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
+            {/* Column 2: Collections & Shop */}
+            <div className="space-y-3">
+              <strong
+                className="uppercase font-bold tracking-wider text-[11px] block"
+                style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
+              >
+                Collections
+              </strong>
+              <ul className="space-y-2">
+                <li>
                   <Link
-                    href={`/shop?category=${c.slug}`}
+                    href="/shop"
                     className={`hover:underline transition-colors ${
                       isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    {c.name}
+                    All Products
                   </Link>
                 </li>
-              ))}
-              <li>
-                <Link
-                  href="/shop?sort=newest"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  New Arrivals
-                </Link>
-              </li>
-            </ul>
-          </div>
+                {matchingThemeDef.sampleCategories.slice(0, 4).map((c) => (
+                  <li key={c.slug}>
+                    <Link
+                      href={`/shop?category=${c.slug}`}
+                      className={`hover:underline transition-colors ${
+                        isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      {c.name}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link
+                    href="/shop?sort=newest"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    New Arrivals
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          {/* Column 3: Customer Care & Order Services (2 cols) */}
-          <div className="lg:col-span-2 space-y-3">
-            <strong
-              className="uppercase font-bold tracking-wider text-[11px] block"
-              style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
-            >
-              Customer Care
-            </strong>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/account"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Track Order
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/account"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  My Account & Orders
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/wishlist"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Saved Wishlist
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/shipping-policy"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Shipping & Delivery
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/return-policy"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Returns & Exchange
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Help & Contact Support
-                </Link>
-              </li>
-            </ul>
-          </div>
+            {/* Column 3: Customer Care & Order Services */}
+            <div className="space-y-3">
+              <strong
+                className="uppercase font-bold tracking-wider text-[11px] block"
+                style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
+              >
+                Customer Care
+              </strong>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/account"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Track Order
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/account"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    My Account & Orders
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/wishlist"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Saved Wishlist
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/shipping-policy"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Shipping & Delivery
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/return-policy"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Returns & Exchange
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Help & Contact Support
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          {/* Column 4: Compliance, Legal & Security (3 cols) */}
-          <div className="lg:col-span-3 space-y-3">
-            <strong
-              className="uppercase font-bold tracking-wider text-[11px] block"
-              style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
-            >
-              Legal & Compliance
-            </strong>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/terms"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacy-policy"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/return-policy"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Refund Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className={`hover:underline transition-colors ${
-                    isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  About Our Brand
-                </Link>
-              </li>
-            </ul>
+            {/* Column 4: Compliance, Legal & Security */}
+            <div className="space-y-3 col-span-2 sm:col-span-1">
+              <strong
+                className="uppercase font-bold tracking-wider text-[11px] block"
+                style={{ color: isDarkFooter ? "#FFFFFF" : "#0F172A" }}
+              >
+                Legal & Compliance
+              </strong>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/terms"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy-policy"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/return-policy"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Refund Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about"
+                    className={`hover:underline transition-colors ${
+                      isDarkFooter ? "text-slate-300 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    About Our Brand
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
