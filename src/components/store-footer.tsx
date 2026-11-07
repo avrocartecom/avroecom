@@ -62,8 +62,8 @@ export default function StoreFooter({ theme }: { theme?: any }) {
   const companyState = theme?.companyState || "Uttar Pradesh";
   const companyPostalCode = theme?.companyPostalCode || "201309";
   const companyCountry = theme?.companyCountry || "India";
-  const supportEmail = theme?.supportEmail || "support@avrostore.com";
-  const supportPhone = theme?.supportPhone || "+91 98765 43210";
+  const supportEmail = theme?.supportEmail || "info.technexttech@gmail.com";
+  const supportPhone = theme?.supportPhone || "+91 94965 90984";
   const taxId = theme?.taxId;
 
   return (

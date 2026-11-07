@@ -56,7 +56,7 @@ export default function ShippingLabelModal({ orders, onClose }: ShippingLabelMod
   const sellerCity = storeSettings?.companyCity || "Noida";
   const sellerState = storeSettings?.companyState || "Uttar Pradesh";
   const sellerPostalCode = storeSettings?.companyPostalCode || "201309";
-  const sellerPhone = storeSettings?.supportPhone || "+91 98765 43210";
+  const sellerPhone = storeSettings?.supportPhone || "+91 94965 90984";
   const sellerGstin = storeSettings?.taxId || "07AAACT9021M1Z4";
 
   // Helper to parse address

@@ -110,10 +110,10 @@ export default async function StoreLayout({
               Store Owner: Update / Renew License
             </Link>
             <a
-              href="mailto:support@technext.co?subject=AVRO%20Storefront%20License%20Renewal"
+              href="mailto:info.technexttech@gmail.com?subject=AVRO%20Storefront%20License%20Renewal"
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center justify-center gap-2 transition-all"
             >
-              Contact Support (support@technext.co)
+              Contact Support (info.technexttech@gmail.com)
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>

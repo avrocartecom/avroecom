@@ -191,8 +191,8 @@ export default function StoreAdminSupportPage() {
         </div>
       </div>
 
-      {/* Support SLA & Contact Banner */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Support & Contact Banner */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Central Connectivity */}
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
@@ -202,31 +202,31 @@ export default function StoreAdminSupportPage() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
           </div>
           <p className="text-sm font-black text-slate-900">Connected to Central</p>
-          <span className="text-[11px] text-emerald-600 font-bold">Direct SLA Route Active</span>
+          <span className="text-[11px] text-emerald-600 font-bold">Direct Support Route Active</span>
         </div>
 
-        {/* WhatsApp Hotline */}
+        {/* WhatsApp & Phone Hotline */}
         <a
-          href="https://wa.me/919876543210?text=Hi%20Technext%20Support%2C%20I%20need%20assistance%20with%20my%20AVRO%20store."
+          href="https://wa.me/919496590984?text=Hi%20Technext%20Support%2C%20I%20need%20assistance%20with%20my%20AVRO%20store."
           target="_blank"
           rel="noreferrer"
           className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:shadow-xs transition space-y-1 group"
         >
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-              Priority WhatsApp
+              Priority Helpline & WhatsApp
             </span>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
           </div>
           <p className="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition">
-            +91 98765 43210
+            +91 94965 90984
           </p>
           <span className="text-[11px] text-slate-500">10:00 AM – 8:00 PM IST</span>
         </a>
 
         {/* Email Support */}
         <a
-          href="mailto:support@technext.co?subject=AVRO%20Store%20Merchant%20Support%20Request"
+          href="mailto:info.technexttech@gmail.com?subject=AVRO%20Store%20Merchant%20Support%20Request"
           className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-xs transition space-y-1 group"
         >
           <div className="flex items-center justify-between">
@@ -236,22 +236,10 @@ export default function StoreAdminSupportPage() {
             <Mail className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition" />
           </div>
           <p className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition">
-            support@technext.co
+            info.technexttech@gmail.com
           </p>
-          <span className="text-[11px] text-slate-500">24/7 Monitored Queue</span>
+          <span className="text-[11px] text-slate-500">Monitored Helpdesk Queue</span>
         </a>
-
-        {/* Guaranteed Response SLA */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-              Guaranteed SLA
-            </span>
-            <ShieldCheck className="w-4 h-4 text-blue-600" />
-          </div>
-          <p className="text-sm font-black text-slate-900">&lt; 2 Hours Response</p>
-          <span className="text-[11px] text-blue-600 font-bold">Commercial License Guarantee</span>
-        </div>
       </div>
 
       {/* Main Support Ticket Console */}

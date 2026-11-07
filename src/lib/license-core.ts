@@ -305,7 +305,7 @@ export const FEATURE_REGISTRY: Record<FeatureKey, FeatureMetadata> = {
   prioritySupport: {
     key: "prioritySupport",
     name: "Priority & 24/7 Call Support",
-    description: "Guaranteed SLA response times and direct 24/7 phone support channel.",
+    description: "Direct 24/7 phone helpline and priority support channel.",
     requiredPlan: "PLUS",
     allowedPlans: ["PLUS"],
     upgradeMessage: "Priority & 24/7 Call Support is exclusive to the Plus plan.",

@@ -145,4 +145,5 @@ This store operates autonomously with offline cryptographic license validation p
 For enterprise onboarding, custom integrations, or questions:
 - **Developer**: TECHNEXT TECHNOLOGIES
 - **Website**: [technext.co](https://technext.co)
-- **Support**: support@technext.co
+- **Support**: info.technexttech@gmail.com
+- **Helpline**: +91 94965 90984

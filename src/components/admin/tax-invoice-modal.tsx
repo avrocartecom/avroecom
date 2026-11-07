@@ -96,8 +96,8 @@ export default function TaxInvoiceModal({ order, onClose }: TaxInvoiceModalProps
   const companyState = storeSettings?.companyState || "Uttar Pradesh";
   const companyPostalCode = storeSettings?.companyPostalCode || "201309";
   const companyCountry = storeSettings?.companyCountry || "India";
-  const supportEmail = storeSettings?.supportEmail || "support@avrostore.com";
-  const supportPhone = storeSettings?.supportPhone || "+91 98765 43210";
+  const supportEmail = storeSettings?.supportEmail || "info.technexttech@gmail.com";
+  const supportPhone = storeSettings?.supportPhone || "+91 94965 90984";
   const taxId = storeSettings?.taxId || "07AAACT9021M1Z4";
 
   // Financial calculations
